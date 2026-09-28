@@ -2,7 +2,7 @@
 <html lang="id" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Company Follow-Up & Progress Dashboard</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -41,15 +41,17 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
     .glass-card {
       background: rgba(30, 41, 59, 0.7);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 4px;
+      height: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
@@ -66,39 +68,46 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col custom-scrollbar">
 
   <!-- Top Navbar -->
-  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[4rem] py-2 sm:py-0 flex flex-col sm:flex-row items-center justify-between gap-3">
       
       <!-- Brand & Title -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white font-bold text-lg">
-          <i class="fa-solid font-bold fa-chart-line"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-bold text-lg sm:text-xl text-slate-100 tracking-tight">Sales Follow-Up Dashboard</h1>
-            <span id="syncStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Live Google Sheets Ready
-            </span>
+      <div class="flex items-center justify-between w-full sm:w-auto gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white font-bold text-base sm:text-lg flex-shrink-0">
+            <i class="fa-solid fa-chart-line"></i>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">Sistem Monitoring Prospek, Leads & Alert Follow-Up Perusahaan</p>
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h1 class="font-bold text-base sm:text-lg text-slate-100 tracking-tight leading-tight">Sales Dashboard</h1>
+              <span id="syncStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Sheets Live
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 hidden sm:block">Monitoring Prospek, Leads & Alert Follow-Up Perusahaan</p>
+          </div>
         </div>
+
+        <!-- Mobile Quick Add Button -->
+        <button onclick="openAddModal()" class="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/30">
+          <i class="fa-solid fa-plus text-xs"></i>
+        </button>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button onclick="openSyncModal()" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+      <div class="flex items-center justify-between w-full sm:w-auto gap-2">
+        <button onclick="openSyncModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
           <i class="fa-solid fa-file-csv text-emerald-400"></i>
-          <span class="hidden md:inline">Hubungkan Sheet</span>
+          <span>Hubungkan Sheet</span>
         </button>
 
-        <button onclick="exportToCSV()" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+        <button onclick="exportToCSV()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
           <i class="fa-solid fa-download text-blue-400"></i>
-          <span class="hidden md:inline">Export CSV</span>
+          <span>Export CSV</span>
         </button>
 
-        <button onclick="openAddModal()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 transition">
+        <button onclick="openAddModal()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 transition">
           <i class="fa-solid fa-plus"></i>
           <span>Tambah Data</span>
         </button>
@@ -107,159 +116,158 @@
   </header>
 
   <!-- Main Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
     <!-- KPI Summary Cards Grid -->
-    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4">
       
       <!-- Total Customers -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-l-4 border-l-blue-500 hover:border-l-blue-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Total Perusahaan</span>
-          <i class="fa-solid fa-building text-blue-400 text-sm"></i>
+      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-blue-500 hover:border-l-blue-400 transition">
+        <div class="flex items-center justify-between text-slate-400 mb-1.5">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Total PT</span>
+          <i class="fa-solid fa-building text-blue-400 text-xs sm:text-sm"></i>
         </div>
         <div class="flex items-baseline justify-between">
-          <span id="kpiTotalCompanies" class="text-2xl font-bold text-white">0</span>
-          <span class="text-[10px] text-slate-400">Unik</span>
+          <span id="kpiTotalCompanies" class="text-xl sm:text-2xl font-bold text-white">0</span>
+          <span class="text-[9px] sm:text-[10px] text-slate-400">Unik</span>
         </div>
       </div>
 
       <!-- Active Prospects -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-l-4 border-l-cyan-500 hover:border-l-cyan-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Prospect</span>
-          <i class="fa-solid fa-file-signature text-cyan-400 text-sm"></i>
+      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-cyan-500 hover:border-l-cyan-400 transition">
+        <div class="flex items-center justify-between text-slate-400 mb-1.5">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Prospect</span>
+          <i class="fa-solid fa-file-signature text-cyan-400 text-xs sm:text-sm"></i>
         </div>
         <div class="flex items-baseline justify-between">
-          <span id="kpiActiveProspects" class="text-2xl font-bold text-white">0</span>
-          <span class="text-[10px] text-cyan-400 font-medium">Ada SPH</span>
+          <span id="kpiActiveProspects" class="text-xl sm:text-2xl font-bold text-white">0</span>
+          <span class="text-[9px] sm:text-[10px] text-cyan-400 font-medium">Ada SPH</span>
         </div>
       </div>
 
       <!-- Active Leads -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-l-4 border-l-indigo-500 hover:border-l-indigo-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Active Leads</span>
-          <i class="fa-solid fa-bullseye text-indigo-400 text-sm"></i>
+      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-indigo-500 hover:border-l-indigo-400 transition">
+        <div class="flex items-center justify-between text-slate-400 mb-1.5">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Leads</span>
+          <i class="fa-solid fa-bullseye text-indigo-400 text-xs sm:text-sm"></i>
         </div>
         <div class="flex items-baseline justify-between">
-          <span id="kpiActiveLeads" class="text-2xl font-bold text-white">0</span>
-          <span class="text-[10px] text-indigo-400 font-medium">Proses Contact</span>
+          <span id="kpiActiveLeads" class="text-xl sm:text-2xl font-bold text-white">0</span>
+          <span class="text-[9px] sm:text-[10px] text-indigo-400 font-medium">Contact</span>
         </div>
       </div>
 
       <!-- Deal / Won -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-l-4 border-l-emerald-500 hover:border-l-emerald-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Deal / Won</span>
-          <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-emerald-500 hover:border-l-emerald-400 transition">
+        <div class="flex items-center justify-between text-slate-400 mb-1.5">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Deal / Won</span>
+          <i class="fa-solid fa-circle-check text-emerald-400 text-xs sm:text-sm"></i>
         </div>
         <div class="flex items-baseline justify-between">
-          <span id="kpiDealWon" class="text-2xl font-bold text-emerald-400">0</span>
-          <span class="text-[10px] text-emerald-400 font-medium">Closing</span>
+          <span id="kpiDealWon" class="text-xl sm:text-2xl font-bold text-emerald-400">0</span>
+          <span class="text-[9px] sm:text-[10px] text-emerald-400 font-medium">Closing</span>
         </div>
       </div>
 
       <!-- Alert Overdue -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-l-4 border-l-rose-500 hover:border-l-rose-400 transition bg-rose-950/10">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-rose-300">Overdue (>14h)</span>
-          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm animate-bounce"></i>
+      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-rose-500 hover:border-l-rose-400 transition bg-rose-950/10">
+        <div class="flex items-center justify-between text-slate-400 mb-1.5">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-rose-300">Overdue</span>
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs sm:text-sm animate-bounce"></i>
         </div>
         <div class="flex items-baseline justify-between">
-          <span id="kpiOverdue" class="text-2xl font-bold text-rose-400">0</span>
-          <span class="text-[10px] text-rose-300 font-semibold bg-rose-500/20 px-1.5 py-0.5 rounded">Prioritas</span>
+          <span id="kpiOverdue" class="text-xl sm:text-2xl font-bold text-rose-400">0</span>
+          <span class="text-[9px] sm:text-[10px] text-rose-300 font-semibold bg-rose-500/20 px-1 py-0.5 rounded">>14 Hari</span>
         </div>
       </div>
 
       <!-- Alert Warning -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-l-4 border-l-amber-500 hover:border-l-amber-400 transition bg-amber-950/10">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-amber-300">Warning (7-14h)</span>
-          <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
+      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-amber-500 hover:border-l-amber-400 transition bg-amber-950/10">
+        <div class="flex items-center justify-between text-slate-400 mb-1.5">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-amber-300">Warning</span>
+          <i class="fa-solid fa-clock text-amber-400 text-xs sm:text-sm"></i>
         </div>
         <div class="flex items-baseline justify-between">
-          <span id="kpiWarning" class="text-2xl font-bold text-amber-400">0</span>
-          <span class="text-[10px] text-amber-300 font-medium">Follow-Up</span>
+          <span id="kpiWarning" class="text-xl sm:text-2xl font-bold text-amber-400">0</span>
+          <span class="text-[9px] sm:text-[10px] text-amber-300 font-medium">7-14 Hari</span>
         </div>
       </div>
 
     </section>
 
     <!-- Analytics Charts Section -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
       
       <!-- Chart 1: Status Distribution -->
-      <div class="lg:col-span-5 glass-card rounded-2xl p-5 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-4">
+      <div class="lg:col-span-5 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-base font-semibold text-slate-100">Distribusi Progress Customer</h2>
-            <p class="text-xs text-slate-400">Persentase tahapan prospek & status customer</p>
+            <h2 class="text-sm sm:text-base font-semibold text-slate-100">Distribusi Progress Customer</h2>
+            <p class="text-[11px] sm:text-xs text-slate-400">Persentase tahapan prospek</p>
           </div>
-          <div class="p-2 rounded-lg bg-slate-800 text-slate-400">
-            <i class="fa-solid fa-chart-pie"></i>
+          <div class="p-1.5 sm:p-2 rounded-lg bg-slate-800 text-slate-400">
+            <i class="fa-solid fa-chart-pie text-xs sm:text-sm"></i>
           </div>
         </div>
-        <div class="relative h-60 w-full flex items-center justify-center">
+        <div class="relative h-48 sm:h-60 w-full flex items-center justify-center">
           <canvas id="statusDonutChart"></canvas>
         </div>
       </div>
 
       <!-- Chart 2: Alert & Progress per Sales Officer -->
-      <div class="lg:col-span-7 glass-card rounded-2xl p-5 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-4">
+      <div class="lg:col-span-7 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-base font-semibold text-slate-100">Performance & Alert per Sales Officer</h2>
-            <p class="text-xs text-slate-400">Jumlah penanganan customer dan status overdue per sales</p>
+            <h2 class="text-sm sm:text-base font-semibold text-slate-100">Performance Sales Officer</h2>
+            <p class="text-[11px] sm:text-xs text-slate-400">Customer & alert overdue per sales</p>
           </div>
-          <div class="p-2 rounded-lg bg-slate-800 text-slate-400">
-            <i class="fa-solid fa-chart-column"></i>
+          <div class="p-1.5 sm:p-2 rounded-lg bg-slate-800 text-slate-400">
+            <i class="fa-solid fa-chart-column text-xs sm:text-sm"></i>
           </div>
         </div>
-        <div class="relative h-60 w-full">
+        <div class="relative h-48 sm:h-60 w-full">
           <canvas id="salesBarChart"></canvas>
         </div>
       </div>
 
     </section>
 
-    <!-- Filters & Action Alert Control Bar -->
-    <section class="glass-card rounded-2xl p-4 space-y-4">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Filters & Controls Bar -->
+    <section class="glass-card rounded-xl sm:rounded-2xl p-3.5 sm:p-4 space-y-3 sm:space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
         <div>
-          <h2 class="text-base font-semibold text-slate-100 flex items-center gap-2">
+          <h2 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
             <i class="fa-solid fa-list-check text-blue-400"></i>
-            Daftar Tindakan Prioritas & Database Customer
+            Daftar Prioritas & Database
           </h2>
-          <p class="text-xs text-slate-400">Data otomatis terurut berdasarkan tanggal follow-up & batas waktu tindakan</p>
+          <p class="text-[11px] sm:text-xs text-slate-400">Otomatis terurut berdasarkan urgensi follow-up</p>
         </div>
 
-        <!-- Format Note Badge Info -->
-        <div class="text-xs bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-2 text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-info-circle text-blue-400"></i>
-          <span>Format Note Baku: <strong class="text-slate-100">[Unit & Qty] _ [Masa Sewa] _ [Status Catatan]</strong></span>
+        <div class="text-[11px] sm:text-xs bg-slate-800/80 border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-slate-300 flex items-center gap-2">
+          <i class="fa-solid fa-info-circle text-blue-400 flex-shrink-0"></i>
+          <span class="truncate">Format Note: <strong class="text-slate-100">[Unit & Qty] _ [Masa Sewa] _ [Catatan]</strong></span>
         </div>
       </div>
 
       <!-- Filter Controls Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         <!-- Search Input -->
         <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari nama PT / ID / Project..." 
-                 class="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
+          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari nama PT / ID / Note..." 
+                 class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
         </div>
 
         <!-- Filter Sales Officer -->
         <div>
-          <select id="filterSales" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+          <select id="filterSales" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
             <option value="ALL">Semua Sales Officer</option>
           </select>
         </div>
 
         <!-- Filter Alert Status -->
         <div>
-          <select id="filterAlert" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+          <select id="filterAlert" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
             <option value="ALL">Semua Status Alert</option>
             <option value="OVERDUE">🔴 Overdue (>14 Hari / Idle)</option>
             <option value="WARNING">🟡 Warning (7-14 Hari)</option>
@@ -269,8 +277,8 @@
 
         <!-- Filter Last Progress -->
         <div>
-          <select id="filterProgress" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-            <option value="ALL">Semua Tahapan Progress</option>
+          <select id="filterProgress" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
+            <option value="ALL">Semua Progress</option>
             <option value="Leads">Leads</option>
             <option value="Prospect">Prospect</option>
             <option value="Deal / Won">Deal / Won</option>
@@ -282,19 +290,19 @@
     </section>
 
     <!-- Table Container -->
-    <section class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+    <section class="glass-card rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800">
       <div class="overflow-x-auto custom-scrollbar">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900/90 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+        <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[750px]">
+          <thead class="bg-slate-900/90 text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
             <tr>
-              <th class="py-3.5 px-4">Perusahaan & Project ID</th>
-              <th class="py-3.5 px-4">Sales Officer</th>
-              <th class="py-3.5 px-4">Last Contact</th>
-              <th class="py-3.5 px-4">Hari Sejak Follow-up</th>
-              <th class="py-3.5 px-4">Progress</th>
-              <th class="py-3.5 px-4">Alert Status</th>
-              <th class="py-3.5 px-4 min-w-[280px]">Detail Note & Progress</th>
-              <th class="py-3.5 px-4 text-center">Aksi Cepat</th>
+              <th class="py-3 px-3 sm:px-4">Perusahaan & Project ID</th>
+              <th class="py-3 px-3 sm:px-4">Sales Officer</th>
+              <th class="py-3 px-3 sm:px-4">Last Contact</th>
+              <th class="py-3 px-3 sm:px-4">Follow-Up</th>
+              <th class="py-3 px-3 sm:px-4">Progress</th>
+              <th class="py-3 px-3 sm:px-4">Alert Status</th>
+              <th class="py-3 px-3 sm:px-4 min-w-[240px]">Detail Note & Progress</th>
+              <th class="py-3 px-3 sm:px-4 text-center">Aksi Cepat</th>
             </tr>
           </thead>
           <tbody id="companyTableBody" class="divide-y divide-slate-800/60 font-normal">
@@ -303,61 +311,52 @@
         </table>
       </div>
 
-      <!-- Empty State / Pagination footer -->
+      <!-- Empty State -->
       <div id="emptyState" class="hidden p-8 text-center text-slate-400">
-        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-600"></i>
-        <p class="text-base font-medium text-slate-300">Tidak ada data customer yang sesuai filter.</p>
-        <p class="text-xs text-slate-500 mt-1">Coba ubah kata kunci pencarian atau reset pilihan filter Anda.</p>
+        <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-600"></i>
+        <p class="text-sm font-medium text-slate-300">Tidak ada data customer yang sesuai filter.</p>
+        <p class="text-xs text-slate-500 mt-1">Coba ubah kata kunci atau pilihan filter Anda.</p>
       </div>
 
-      <div class="px-4 py-3 bg-slate-900/50 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+      <!-- Footer Info -->
+      <div class="px-3 sm:px-4 py-2.5 bg-slate-900/50 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-slate-400 gap-1.5">
         <div>
           Menampilkan <span id="showingCount" class="font-semibold text-slate-200">0</span> dari <span id="totalCount" class="font-semibold text-slate-200">0</span> perusahaan
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="resetDataToDefault()" class="hover:underline text-slate-400 hover:text-blue-400">
-            <i class="fa-solid fa-rotate-left mr-1"></i> Reset Data Contoh
-          </button>
-        </div>
+        <button onclick="fetchGoogleSheetsData(DEFAULT_SHEET_URL)" class="hover:underline text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+          <i class="fa-solid fa-rotate text-[10px]"></i> Sync Ulang Sheet
+        </button>
       </div>
     </section>
 
   </main>
 
   <!-- MODAL 1: Connect Google Sheets -->
-  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl max-w-lg w-full p-6 space-y-5 border border-slate-700 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <h3 class="text-base font-semibold text-slate-100 flex items-center gap-2">
+  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="glass-card rounded-xl sm:rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
           <i class="fa-solid fa-file-csv text-emerald-400"></i>
-          Hubungkan Google Sheets (Live Sync)
+          Hubungkan Google Sheets
         </h3>
-        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-200 p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
       <div class="space-y-3 text-xs text-slate-300">
-        <p class="font-medium text-slate-200">Cara Mengambil Link CSV dari Google Sheets Anda:</p>
-        <ol class="list-decimal list-inside space-y-1.5 text-slate-400 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-          <li>Buka file Google Sheets Anda.</li>
-          <li>Klik menu <strong class="text-slate-200">File</strong> &gt; <strong class="text-slate-200">Bagikan (Share)</strong> &gt; <strong class="text-slate-200">Publikasikan ke Web</strong>.</li>
-          <li>Pilih Sheet data Anda dan ubah format dari Web Page ke <strong class="text-emerald-400">Comma-separated values (.csv)</strong>.</li>
-          <li>Klik tombol <strong class="text-slate-200">Publikasikan</strong> lalu salin (copy) URL yang dihasilkan.</li>
-        </ol>
-
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Paste URL Google Sheets CSV di Sini:</label>
-          <input type="url" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv" 
+          <label class="block text-xs font-medium text-slate-300 mb-1">URL Google Sheets CSV Terhubung:</label>
+          <input type="url" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" 
                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500">
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-3 pt-2">
-        <button onclick="closeSyncModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeSyncModal()" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
           Batal
         </button>
-        <button onclick="fetchGoogleSheetsData()" class="px-4 py-2 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-2">
+        <button onclick="fetchGoogleSheetsData()" class="px-4 py-2 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1.5">
           <i class="fa-solid fa-sync"></i>
           Tarik Data Sekarang
         </button>
@@ -366,30 +365,30 @@
   </div>
 
   <!-- MODAL 2: Add / Edit Company Data -->
-  <div id="companyModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl max-w-xl w-full p-6 space-y-4 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+  <div id="companyModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="glass-card rounded-xl sm:rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3.5 border border-slate-700 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="modalTitle" class="text-base font-semibold text-slate-100">Tambah Data Customer</h3>
-        <button onclick="closeCompanyModal()" class="text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <h3 id="modalTitle" class="text-sm sm:text-base font-semibold text-slate-100">Tambah Data Customer</h3>
+        <button onclick="closeCompanyModal()" class="text-slate-400 hover:text-slate-200 p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
-      <form id="companyForm" onsubmit="saveCompanyData(event)" class="space-y-4 text-xs">
+      <form id="companyForm" onsubmit="saveCompanyData(event)" class="space-y-3 text-xs">
         <input type="hidden" id="formRowId">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
             <label class="block font-medium text-slate-300 mb-1">Nama Perusahaan *</label>
-            <input type="text" id="formCompanyName" required placeholder="Contoh: PT Petrokimia Utama" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
+            <input type="text" id="formCompanyName" required placeholder="PT Petrokimia Utama" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
           </div>
           <div>
             <label class="block font-medium text-slate-300 mb-1">Company ID / Ref</label>
-            <input type="text" id="formCompanyId" placeholder="Contoh: CMP-088" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
+            <input type="text" id="formCompanyId" placeholder="CMP-088" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
             <label class="block font-medium text-slate-300 mb-1">Sales Officer *</label>
             <input type="text" id="formSalesOfficer" required placeholder="Nama Sales" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
@@ -400,7 +399,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
             <label class="block font-medium text-slate-300 mb-1">Tanggal Last Follow-up *</label>
             <input type="date" id="formLastFollowUp" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
@@ -419,28 +418,28 @@
 
         <!-- Structured Note Section -->
         <div class="p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2">
-          <span class="block text-xs font-semibold text-blue-400">Penyusunan Catatan Detail Note (Sesuai Format Baku)</span>
+          <span class="block text-[11px] font-semibold text-blue-400">Penyusunan Catatan Detail Note</span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <label class="block text-[11px] text-slate-400 mb-0.5">Jenis & Qty Unit</label>
+              <label class="block text-[10px] text-slate-400 mb-0.5">Jenis & Qty Unit</label>
               <input type="text" id="formUnitQty" placeholder="Forklift 3 Ton (2 Unit)" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
             </div>
             <div>
-              <label class="block text-[11px] text-slate-400 mb-0.5">Masa Sewa</label>
+              <label class="block text-[10px] text-slate-400 mb-0.5">Masa Sewa</label>
               <input type="text" id="formMasaSewa" placeholder="2 Tahun" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
             </div>
           </div>
           <div>
-            <label class="block text-[11px] text-slate-400 mb-0.5">Catatan Progress Terbaru</label>
-            <input type="text" id="formCatatanStatus" placeholder="SPH dikirim ke user, menunggu jadwal visit" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
+            <label class="block text-[10px] text-slate-400 mb-0.5">Catatan Progress Terbaru</label>
+            <input type="text" id="formCatatanStatus" placeholder="SPH dikirim ke user, menunggu visit" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-2">
-          <button type="button" onclick="closeCompanyModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeCompanyModal()" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
             Batal
           </button>
-          <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white">
+          <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white">
             Simpan Data
           </button>
         </div>
@@ -449,130 +448,29 @@
   </div>
 
   <script>
-    // Global Application State
+    // URL CSV Google Sheets Default
+    const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSm4xVtrZqQPMWjlsdc6rbkfTBDYLnnD1IUfOwPJq5NKQRLT9noTfMreOfmefZhZ0P6zmRwuFivUuFG/pub?gid=1972181690&single=true&output=csv";
+
     let masterData = [];
     let filteredData = [];
     let donutChartInstance = null;
     let barChartInstance = null;
 
-    // Realistic Default Data
-    const defaultSampleData = [
-      {
-        id: 1,
-        companyId: "CMP-001",
-        companyName: "PT Petrokimia Nusantara",
-        salesOfficer: "Budi Santoso",
-        projectId: "PRJ-2026-089",
-        lastFollowUp: getRelativeDateStr(26), // 26 days ago -> Overdue
-        lastProgress: "Leads",
-        noteUnit: "Forklift 3 Ton (2 Unit)",
-        noteMasaSewa: "2 Tahun",
-        noteStatus: "Menunggu konfirmasi user untuk jadwal visit teknis ulang"
-      },
-      {
-        id: 2,
-        companyId: "CMP-002",
-        companyName: "CV Ravico Mandiri Utama",
-        salesOfficer: "Dewi Anggraini",
-        projectId: "PRJ-2026-112",
-        lastFollowUp: getRelativeDateStr(10), // 10 days ago -> Warning
-        lastProgress: "Leads",
-        noteUnit: "Reach Truck 1.5 Ton (1 Unit)",
-        noteMasaSewa: "1 Tahun",
-        noteStatus: "SPH #234/SPH/IX/2026 telah dikirim via WA ke Procurement"
-      },
-      {
-        id: 3,
-        companyId: "CMP-003",
-        companyName: "PT Indofood Sukses Makmur",
-        salesOfficer: "Hendra Wijaya",
-        projectId: "PRJ-2026-145",
-        lastFollowUp: getRelativeDateStr(2), // 2 days ago -> Safe
-        lastProgress: "Prospect",
-        noteUnit: "Stacker Electric (3 Unit)",
-        noteMasaSewa: "3 Tahun",
-        noteStatus: "Nego harga sewa bulanan dan draf kontrak payung"
-      },
-      {
-        id: 4,
-        companyId: "CMP-004",
-        companyName: "PT Astra Otoparts Tbk",
-        salesOfficer: "Rian Pratama",
-        projectId: "PRJ-2026-054",
-        lastFollowUp: getRelativeDateStr(45), // 45 days ago -> Overdue
-        lastProgress: "Leads",
-        noteUnit: "Tow Tractor (2 Unit)",
-        noteMasaSewa: "1 Tahun",
-        noteStatus: "Tidak merespons sales call 3x, butuh visit langsung"
-      },
-      {
-        id: 5,
-        companyId: "CMP-005",
-        companyName: "PT Trans Retail Indonesia",
-        salesOfficer: "Siti Rahmawati",
-        projectId: "PRJ-2026-160",
-        lastFollowUp: getRelativeDateStr(1), // 1 day ago -> Deal
-        lastProgress: "Deal / Won",
-        noteUnit: "Forklift Diesel 5 Ton (1 Unit)",
-        noteMasaSewa: "2 Tahun",
-        noteStatus: "PO terbit #PO-8812, proses pengerjaan unit di workshop"
-      },
-      {
-        id: 6,
-        companyId: "CMP-006",
-        companyName: "PT Mayora Indah Tbk",
-        salesOfficer: "Budi Santoso",
-        projectId: "PRJ-2026-130",
-        lastFollowUp: getRelativeDateStr(8), // 8 days ago -> Warning
-        lastProgress: "Leads",
-        noteUnit: "Scissor Lift 12m (2 Unit)",
-        noteMasaSewa: "6 Bulan",
-        noteStatus: "Quotation dikirim, janji follow-up minggu depan"
-      },
-      {
-        id: 7,
-        companyId: "CMP-007",
-        companyName: "PT Unilever Indonesia Tbk",
-        salesOfficer: "Dewi Anggraini",
-        projectId: "PRJ-2026-175",
-        lastFollowUp: getRelativeDateStr(3), // 3 days ago
-        lastProgress: "Prospect",
-        noteUnit: "Pallet Mover (4 Unit)",
-        noteMasaSewa: "2 Tahun",
-        noteStatus: "Presentasi produk ke Head Logistics & HSE"
-      },
-      {
-        id: 8,
-        companyId: "CMP-008",
-        companyName: "PT Kalbe Farma Tbk",
-        salesOfficer: "Hendra Wijaya",
-        projectId: "PRJ-2026-020",
-        lastFollowUp: getRelativeDateStr(18), // Overdue
-        lastProgress: "Idle",
-        noteUnit: "Forklift Lithium 2 Ton (1 Unit)",
-        noteMasaSewa: "1 Tahun",
-        noteStatus: "Project ditunda hingga Q4, status diturunkan ke Idle"
-      }
-    ];
-
-    // Helper: Compute Date Relative to Today
     function getRelativeDateStr(daysAgo) {
       const d = new Date();
       d.setDate(d.getDate() - daysAgo);
       return d.toISOString().split('T')[0];
     }
 
-    // Helper: Compute Days Difference
     function computeDaysSince(dateStr) {
       if (!dateStr) return 0;
       const today = new Date();
       const past = new Date(dateStr);
       const diffTime = today - past;
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays < 0 ? 0 : diffDays;
+      return isNaN(diffDays) || diffDays < 0 ? 0 : diffDays;
     }
 
-    // Helper: Determine Alert Status
     function computeAlertStatus(lastProgress, daysSince) {
       if (lastProgress === "Deal / Won") return "DEAL CLOSED";
       if (lastProgress === "Lost" || lastProgress === "Idle") return "IDLE / INACTIVE";
@@ -586,47 +484,19 @@
       }
     }
 
-    // App Initialization
     window.onload = function() {
-      loadInitialData();
-      populateSalesDropdown();
-      applyFilters();
       initCharts();
+      fetchGoogleSheetsData(DEFAULT_SHEET_URL, true);
     };
-
-    // Load data from LocalStorage or default
-    function loadInitialData() {
-      const saved = localStorage.getItem('sales_dashboard_master_data');
-      if (saved) {
-        try {
-          masterData = JSON.parse(saved);
-        } catch(e) {
-          masterData = [...defaultSampleData];
-        }
-      } else {
-        masterData = [...defaultSampleData];
-      }
-    }
 
     function saveMasterData() {
       localStorage.setItem('sales_dashboard_master_data', JSON.stringify(masterData));
     }
 
-    function resetDataToDefault() {
-      if (confirm('Kembalikan data ke contoh awal? Perubahan lokal akan direset.')) {
-        masterData = [...defaultSampleData];
-        saveMasterData();
-        populateSalesDropdown();
-        applyFilters();
-      }
-    }
-
-    // Populate Sales Officer Select Options
     function populateSalesDropdown() {
       const salesSet = new Set(masterData.map(item => item.salesOfficer).filter(Boolean));
       const select = document.getElementById('filterSales');
       
-      // Preserve current selection if possible
       const currentVal = select.value;
       select.innerHTML = '<option value="ALL">Semua Sales Officer</option>';
       
@@ -640,7 +510,6 @@
       select.value = currentVal;
     }
 
-    // Main Filtering & Rendering Routine
     function applyFilters() {
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
       const salesVal = document.getElementById('filterSales').value;
@@ -651,20 +520,15 @@
         const daysSince = computeDaysSince(item.lastFollowUp);
         const alertStatus = computeAlertStatus(item.lastProgress, daysSince);
 
-        // Search match
         const matchSearch = !searchVal || 
-          item.companyName.toLowerCase().includes(searchVal) ||
+          (item.companyName && item.companyName.toLowerCase().includes(searchVal)) ||
           (item.companyId && item.companyId.toLowerCase().includes(searchVal)) ||
           (item.projectId && item.projectId.toLowerCase().includes(searchVal)) ||
           (item.noteStatus && item.noteStatus.toLowerCase().includes(searchVal));
 
-        // Sales match
         const matchSales = (salesVal === 'ALL') || (item.salesOfficer === salesVal);
-
-        // Progress match
         const matchProgress = (progressVal === 'ALL') || (item.lastProgress === progressVal);
 
-        // Alert match
         let matchAlert = true;
         if (alertVal === 'OVERDUE') {
           matchAlert = alertStatus.includes('OVERDUE');
@@ -677,7 +541,6 @@
         return matchSearch && matchSales && matchProgress && matchAlert;
       });
 
-      // Sort filtered data: Overdue first, then by daysSince descending
       filteredData.sort((a, b) => {
         const daysA = computeDaysSince(a.lastFollowUp);
         const daysB = computeDaysSince(b.lastFollowUp);
@@ -689,7 +552,6 @@
       updateCharts();
     }
 
-    // Update KPI Summary Badges
     function updateKPIs() {
       const totalCompanies = masterData.length;
       let activeProspects = 0;
@@ -721,7 +583,6 @@
       document.getElementById('totalCount').textContent = totalCompanies;
     }
 
-    // Render Data Table
     function renderTable() {
       const tbody = document.getElementById('companyTableBody');
       const emptyState = document.getElementById('emptyState');
@@ -739,90 +600,87 @@
         const daysSince = computeDaysSince(item.lastFollowUp);
         const alertStatus = computeAlertStatus(item.lastProgress, daysSince);
 
-        // Alert Badge Styling
         let alertBadgeHTML = '';
         if (alertStatus.includes('OVERDUE')) {
           alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
               <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
-              OVERDUE (>14 Hari)
+              OVERDUE (>14h)
             </span>`;
         } else if (alertStatus.includes('WARNING')) {
           alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <i class="fa-solid fa-triangle-exclamation text-[10px]"></i>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <i class="fa-solid fa-triangle-exclamation text-[9px]"></i>
               WARNING (7-14h)
             </span>`;
         } else if (alertStatus.includes('DEAL')) {
           alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i class="fa-solid fa-check text-[10px]"></i>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <i class="fa-solid fa-check text-[9px]"></i>
               DEAL WON
             </span>`;
         } else {
           alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
               SAFE / ON TRACK
             </span>`;
         }
 
-        // Progress Badge
         let progressBadgeHTML = '';
         if (item.lastProgress === 'Prospect') {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Prospect</span>`;
+          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Prospect</span>`;
         } else if (item.lastProgress === 'Leads') {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Leads</span>`;
+          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Leads</span>`;
         } else if (item.lastProgress === 'Deal / Won') {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Deal / Won</span>`;
+          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Deal / Won</span>`;
         } else {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-400 border border-slate-700">${item.lastProgress || 'Idle'}</span>`;
+          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-400 border border-slate-700">${item.lastProgress || 'Idle'}</span>`;
         }
 
-        // Formatted Detail Note
         const formattedNote = `${item.noteUnit || 'Unit -'} _ ${item.noteMasaSewa || 'Sewa -'} _ ${item.noteStatus || 'Belum ada catatan'}`;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-900/60 transition group";
 
         tr.innerHTML = `
-          <td class="py-3.5 px-4">
+          <td class="py-3 px-3 sm:px-4">
             <div class="font-semibold text-slate-100 group-hover:text-blue-400 transition">${item.companyName}</div>
-            <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+            <div class="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
               <span>${item.companyId || 'No ID'}</span>
               <span>•</span>
-              <span class="text-slate-300 font-mono">${item.projectId}</span>
+              <span class="text-slate-300 font-mono">${item.projectId || '-'}</span>
             </div>
           </td>
-          <td class="py-3.5 px-4 font-medium text-slate-200">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-blue-400">
+          <td class="py-3 px-3 sm:px-4 font-medium text-slate-200">
+            <div class="flex items-center gap-1.5">
+              <div class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[9px] font-bold text-blue-400">
                 ${(item.salesOfficer || 'S').charAt(0)}
               </div>
               <span>${item.salesOfficer}</span>
             </div>
           </td>
-          <td class="py-3.5 px-4 text-xs text-slate-300">
+          <td class="py-3 px-3 sm:px-4 text-xs text-slate-300">
             ${item.lastFollowUp || '-'}
           </td>
-          <td class="py-3.5 px-4">
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold ${daysSince > 14 ? 'text-rose-400' : daysSince >= 7 ? 'text-amber-400' : 'text-slate-200'}">${daysSince} Hari</span>
+          <td class="py-3 px-3 sm:px-4">
+            <div class="flex items-center gap-1">
+              <span class="font-bold ${daysSince > 14 ? 'text-rose-400' : daysSince >= 7 ? 'text-amber-400' : 'text-slate-200'}">${daysSince}h</span>
               <span class="text-[10px] text-slate-500">lalu</span>
             </div>
           </td>
-          <td class="py-3.5 px-4">
+          <td class="py-3 px-3 sm:px-4">
             ${progressBadgeHTML}
           </td>
-          <td class="py-3.5 px-4">
+          <td class="py-3 px-3 sm:px-4">
             ${alertBadgeHTML}
           </td>
-          <td class="py-3.5 px-4">
-            <div class="text-xs text-slate-300 bg-slate-900/80 p-2 rounded-lg border border-slate-800/80 leading-relaxed font-mono text-[11px]">
+          <td class="py-3 px-3 sm:px-4">
+            <div class="text-[11px] text-slate-300 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800/80 leading-relaxed font-mono">
               ${formattedNote}
             </div>
           </td>
-          <td class="py-3.5 px-4 text-center">
-            <div class="flex items-center justify-center gap-1.5">
+          <td class="py-3 px-3 sm:px-4 text-center">
+            <div class="flex items-center justify-center gap-1">
               <button onclick="quickUpdateFollowUp(${item.id})" title="Update Follow-Up Hari Ini" class="p-1.5 rounded-lg bg-slate-800 hover:bg-emerald-600/20 text-slate-400 hover:text-emerald-400 transition border border-slate-700">
                 <i class="fa-solid fa-calendar-check text-xs"></i>
               </button>
@@ -840,7 +698,6 @@
       });
     }
 
-    // Quick Action: Set follow up date to TODAY
     function quickUpdateFollowUp(id) {
       const item = masterData.find(d => d.id === id);
       if (item) {
@@ -851,7 +708,6 @@
       }
     }
 
-    // Delete Company Record
     function deleteCompany(id) {
       if (confirm('Apakah Anda yakin ingin menghapus data customer ini?')) {
         masterData = masterData.filter(d => d.id !== id);
@@ -861,9 +717,7 @@
       }
     }
 
-    // Chart.js Visualizations Setup
     function initCharts() {
-      // Donut Chart
       const donutCtx = document.getElementById('statusDonutChart').getContext('2d');
       donutChartInstance = new Chart(donutCtx, {
         type: 'doughnut',
@@ -884,17 +738,16 @@
               position: 'bottom',
               labels: {
                 color: '#94a3b8',
-                font: { size: 11, family: 'Inter' },
-                padding: 12,
+                font: { size: 10, family: 'Inter' },
+                padding: 10,
                 usePointStyle: true
               }
             }
           },
-          cutout: '70%'
+          cutout: '68%'
         }
       });
 
-      // Bar Chart
       const barCtx = document.getElementById('salesBarChart').getContext('2d');
       barChartInstance = new Chart(barCtx, {
         type: 'bar',
@@ -902,16 +755,16 @@
           labels: [],
           datasets: [
             {
-              label: 'Active Leads & Prospect',
+              label: 'Active (Leads/Prospect)',
               data: [],
               backgroundColor: '#3b82f6',
-              borderRadius: 6
+              borderRadius: 4
             },
             {
-              label: 'Overdue (>14 Hari)',
+              label: 'Overdue (>14h)',
               data: [],
               backgroundColor: '#f43f5e',
-              borderRadius: 6
+              borderRadius: 4
             }
           ]
         },
@@ -921,18 +774,18 @@
           scales: {
             x: {
               grid: { display: false },
-              ticks: { color: '#94a3b8', font: { size: 11 } }
+              ticks: { color: '#94a3b8', font: { size: 10 } }
             },
             y: {
               grid: { color: 'rgba(51, 65, 85, 0.4)' },
-              ticks: { color: '#94a3b8', font: { size: 11 }, precision: 0 },
+              ticks: { color: '#94a3b8', font: { size: 10 }, precision: 0 },
               beginAtZero: true
             }
           },
           plugins: {
             legend: {
               position: 'top',
-              labels: { color: '#94a3b8', font: { size: 11 }, usePointStyle: true }
+              labels: { color: '#94a3b8', font: { size: 10 }, usePointStyle: true }
             }
           }
         }
@@ -942,7 +795,6 @@
     function updateCharts() {
       if (!donutChartInstance || !barChartInstance) return;
 
-      // Update Donut Chart
       let leads = 0, prospect = 0, deal = 0, other = 0;
       masterData.forEach(item => {
         if (item.lastProgress === 'Leads') leads++;
@@ -954,7 +806,6 @@
       donutChartInstance.data.datasets[0].data = [leads, prospect, deal, other];
       donutChartInstance.update();
 
-      // Update Bar Chart per Sales
       const salesMap = {};
       masterData.forEach(item => {
         const sales = item.salesOfficer || 'Unassigned';
@@ -983,10 +834,14 @@
       barChartInstance.update();
     }
 
-    // Modal Management
     function openSyncModal() {
+      const inputEl = document.getElementById('sheetUrlInput');
+      if (inputEl && !inputEl.value) {
+        inputEl.value = DEFAULT_SHEET_URL;
+      }
       document.getElementById('syncModal').classList.remove('hidden');
     }
+
     function closeSyncModal() {
       document.getElementById('syncModal').classList.add('hidden');
     }
@@ -1037,7 +892,6 @@
       const noteStatus = document.getElementById('formCatatanStatus').value.trim();
 
       if (id) {
-        // Edit Existing
         const item = masterData.find(d => d.id === parseInt(id));
         if (item) {
           item.companyName = companyName;
@@ -1051,7 +905,6 @@
           item.noteStatus = noteStatus;
         }
       } else {
-        // Add New
         const newObj = {
           id: Date.now(),
           companyId: companyId || `CMP-${Math.floor(100 + Math.random() * 900)}`,
@@ -1073,11 +926,12 @@
       closeCompanyModal();
     }
 
-    // Google Sheets Sync via PapaParse CSV
-    function fetchGoogleSheetsData() {
-      const url = document.getElementById('sheetUrlInput').value.trim();
+    function fetchGoogleSheetsData(targetUrl = null, isAutoLoad = false) {
+      const inputEl = document.getElementById('sheetUrlInput');
+      const url = targetUrl || (inputEl ? inputEl.value.trim() : DEFAULT_SHEET_URL);
+
       if (!url) {
-        alert('Masukkan URL CSV Google Sheets terlebih dahulu!');
+        if (!isAutoLoad) alert('Masukkan URL CSV Google Sheets terlebih dahulu!');
         return;
       }
 
@@ -1089,21 +943,20 @@
           if (results.data && results.data.length > 0) {
             const parsedList = [];
             results.data.forEach((row, idx) => {
-              // Flexible column header matching
-              const companyName = row['Nama Perusahaan'] || row['Company Name'] || row['Nama Customer'] || row['Company'] || '';
+              const companyName = row['Nama Perusahaan'] || row['Company Name'] || row['Nama Customer'] || row['Company'] || Object.values(row)[0] || '';
               if (!companyName) return;
 
               parsedList.push({
                 id: idx + 1,
-                companyId: row['Company ID'] || row['ID Customer'] || `CMP-${idx+1}`,
+                companyId: row['Company ID'] || row['ID Customer'] || row['ID Perusahaan'] || `CMP-${String(idx+1).padStart(3, '0')}`,
                 companyName: companyName,
-                salesOfficer: row['Sales Officer'] || row['PIC Sales'] || row['Sales'] || 'Sales',
-                projectId: row['Project ID'] || row['Last Project ID'] || `PRJ-${idx+1}`,
-                lastFollowUp: row['Tgl Last Follow-up'] || row['Last Contact'] || row['Tanggal'] || getRelativeDateStr(5),
-                lastProgress: row['Last Progress'] || row['Status'] || 'Leads',
-                noteUnit: row['Unit & Qty'] || row['Unit'] || '',
-                noteMasaSewa: row['Masa Sewa'] || row['Sewa'] || '',
-                noteStatus: row['Catatan Progress'] || row['Detail Note'] || row['Catatan'] || ''
+                salesOfficer: row['Sales Officer'] || row['PIC Sales'] || row['Sales'] || row['Officer'] || 'Sales',
+                projectId: row['Project ID'] || row['Last Project ID'] || row['ID Project'] || `PRJ-${idx+1}`,
+                lastFollowUp: row['Tgl Last Follow-up'] || row['Last Contact'] || row['Tanggal Follow Up'] || row['Tanggal'] || getRelativeDateStr(0),
+                lastProgress: row['Last Progress'] || row['Status'] || row['Progress'] || 'Leads',
+                noteUnit: row['Unit & Qty'] || row['Unit'] || row['Jenis Unit'] || '',
+                noteMasaSewa: row['Masa Sewa'] || row['Sewa'] || row['Durasi'] || '',
+                noteStatus: row['Catatan Progress'] || row['Detail Note'] || row['Catatan'] || row['Note'] || ''
               });
             });
 
@@ -1112,20 +965,32 @@
               saveMasterData();
               populateSalesDropdown();
               applyFilters();
-              closeSyncModal();
-              alert(`Berhasil menarik ${parsedList.length} data customer dari Google Sheets!`);
-            } else {
+              
+              if (!isAutoLoad) {
+                closeSyncModal();
+                alert(`Berhasil menarik ${parsedList.length} data customer dari Google Sheets!`);
+              }
+            } else if (!isAutoLoad) {
               alert('Gagal membaca data dari Sheet. Pastikan format kolom header sesuai.');
             }
           }
         },
         error: function(err) {
-          alert('Error saat menarik data Google Sheets. Pastikan link dipublikasikan sebagai CSV.');
+          console.error('Fetch Google Sheets CSV error:', err);
+          if (!isAutoLoad) {
+            alert('Error saat menarik data Google Sheets. Pastikan link dipublikasikan sebagai CSV.');
+          } else {
+            const saved = localStorage.getItem('sales_dashboard_master_data');
+            if (saved) {
+              try { masterData = JSON.parse(saved); } catch(e) {}
+            }
+            populateSalesDropdown();
+            applyFilters();
+          }
         }
       });
     }
 
-    // Export Current View to CSV
     function exportToCSV() {
       if (filteredData.length === 0) {
         alert('Tidak ada data untuk diexport.');
