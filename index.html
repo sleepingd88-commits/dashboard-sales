@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Sales Follow-Up & Action Alert Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-700/60 pb-5">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                    Company Sales Follow-Up & Action Alert
+                </h1>
+                <p class="text-sm text-slate-400 mt-1">Real-time Sync dengan Google Sheets</p>
+            </div>
+            <button onclick="fetchData()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition text-sm flex items-center gap-2">
+                <i class="fa-solid fa-rotate"></i> Refresh Data
+            </button>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="glass-card p-4 rounded-xl border-l-4 border-red-500">
+                <p class="text-xs text-slate-400 font-medium">Overdue / Idle</p>
+                <h3 id="kpi-overdue" class="text-2xl font-bold text-red-400 mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-amber-500">
+                <p class="text-xs text-slate-400 font-medium">Warning (≤ 7 Hari)</p>
+                <h3 id="kpi-warning" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-blue-500">
+                <p class="text-xs text-slate-400 font-medium">Active Prospect</p>
+                <h3 id="kpi-prospect" class="text-2xl font-bold text-blue-400 mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-emerald-500">
+                <p class="text-xs text-slate-400 font-medium">Deal / Won</p>
+                <h3 id="kpi-deal" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-indigo-500 col-span-2 md:col-span-1">
+                <p class="text-xs text-slate-400 font-medium">Total Company</p>
+                <h3 id="kpi-total" class="text-2xl font-bold text-indigo-400 mt-1">0</h3>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="glass-card rounded-xl p-5 overflow-x-auto">
+            <h2 class="text-lg font-semibold mb-4 text-slate-200">Data Customer & Action Alert List</h2>
+            <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-slate-800/80 text-xs text-slate-400 uppercase">
+                    <tr>
+                        <th class="p-3">Sales</th>
+                        <th class="p-3">Company</th>
+                        <th class="p-3">Last Progress</th>
+                        <th class="p-3">Detail & Note</th>
+                        <th class="p-3">Status Alert</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="divide-y divide-slate-800">
+                    <tr><td colspan="5" class="p-4 text-center text-slate-500">Memuat data dari Google Sheets...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const googleSheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSm4xVtrZqQPMWjlsdc6rbkfBDYLnnD1IUfOwPJq5NKQRLT9noTfMreOfmefZhZOP6zmRwuFivUuFG/pub?gid=1972181690&single=true&output=csv';
+
+        async function fetchData() {
+            try {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(googleSheetCsvUrl);
+                let response = await fetch(proxyUrl);
+                if (!response.ok) response = await fetch(googleSheetCsvUrl);
+                const csvText = await response.text();
+
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) { renderDashboard(results.data); }
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderDashboard(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            let overdue=0, warning=0, prospect=0, deal=0;
+
+            data.forEach(row => {
+                const sales = row['Sales Officer'] || '-';
+                const company = row['Company Name'] || '-';
+                const progress = row['Last Progress'] || '-';
+                const note = row['Detail Progress & Note'] || '-';
+                const daysLeft = parseInt(row['Leads to Idle (Left Days)']) || 0;
+
+                let alertBadge = `<span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded text-xs">Safe (${daysLeft} Hari)</span>`;
+                if (progress.toLowerCase().includes('deal')) {
+                    deal++;
+                } else if (daysLeft <= 0) {
+                    overdue++;
+                    alertBadge = `<span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs font-semibold">OVERDUE</span>`;
+                } else if (daysLeft <= 7) {
+                    warning++;
+                    alertBadge = `<span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs font-semibold">WARNING (${daysLeft} Hari)</span>`;
+                } else {
+                    prospect++;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-3 font-medium text-slate-200">${sales}</td>
+                        <td class="p-3">${company}</td>
+                        <td class="p-3"><span class="px-2 py-1 bg-slate-700 rounded text-xs">${progress}</span></td>
+                        <td class="p-3 text-xs text-slate-400">${note}</td>
+                        <td class="p-3">${alertBadge}</td>
+                    </tr>`;
+            });
+
+            document.getElementById('kpi-overdue').innerText = overdue;
+            document.getElementById('kpi-warning').innerText = warning;
+            document.getElementById('kpi-prospect').innerText = prospect;
+            document.getElementById('kpi-deal').innerText = deal;
+            document.getElementById('kpi-total').innerText = data.length;
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
