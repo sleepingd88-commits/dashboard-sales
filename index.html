@@ -1,1100 +1,166 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Company Follow-Up & Progress Dashboard</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- PapaParse for Google Sheets CSV Sync -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <!-- Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
-            }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Saya</title>
+    <style>
+        /* Reset tampilan bawaan browser */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-      }
-    }
-  </script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .glass-card {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #475569;
-    }
-  </style>
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigasi Atas */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #3498db;
+        }
+
+        /* Banner Utama (Hero) */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Area Konten Utama */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            flex: 1;
+            min-width: 250px;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 3rem;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col custom-scrollbar">
+<body>
 
-  <!-- Top Navbar -->
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[4rem] py-2 sm:py-0 flex flex-col sm:flex-row items-center justify-between gap-3">
-      
-      <!-- Brand & Title -->
-      <div class="flex items-center justify-between w-full sm:w-auto gap-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white font-bold text-base sm:text-lg flex-shrink-0">
-            <i class="fa-solid fa-chart-line"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <h1 class="font-bold text-base sm:text-lg text-slate-100 tracking-tight leading-tight">Sales Dashboard</h1>
-              <span id="syncStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Sheets Live
-              </span>
-            </div>
-            <p class="text-[11px] text-slate-400 hidden sm:block">Monitoring Prospek, Leads & Alert Follow-Up Perusahaan</p>
-          </div>
-        </div>
+    <!-- NAVIGASI / HEADER -->
+    <header>
+        <h1>Website Saya</h1>
+        <nav>
+            <a href="#beranda">Beranda</a>
+            <a href="#tentang">Tentang</a>
+            <a href="#layanan">Layanan</a>
+        </nav>
+    </header>
 
-        <!-- Mobile Quick Add Button -->
-        <button onclick="openAddModal()" class="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/30">
-          <i class="fa-solid fa-plus text-xs"></i>
-        </button>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center justify-between w-full sm:w-auto gap-2">
-        <button onclick="openSyncModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-          <i class="fa-solid fa-file-csv text-emerald-400"></i>
-          <span>Hubungkan Sheet</span>
-        </button>
-
-        <button onclick="exportToCSV()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-          <i class="fa-solid fa-download text-blue-400"></i>
-          <span>Export CSV</span>
-        </button>
-
-        <button onclick="openAddModal()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 transition">
-          <i class="fa-solid fa-plus"></i>
-          <span>Tambah Data</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
-
-    <!-- KPI Summary Cards Grid -->
-    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4">
-      
-      <!-- Total Customers -->
-      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-blue-500 hover:border-l-blue-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-1.5">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Total PT</span>
-          <i class="fa-solid fa-building text-blue-400 text-xs sm:text-sm"></i>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <span id="kpiTotalCompanies" class="text-xl sm:text-2xl font-bold text-white">0</span>
-          <span class="text-[9px] sm:text-[10px] text-slate-400">Unik</span>
-        </div>
-      </div>
-
-      <!-- Active Prospects -->
-      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-cyan-500 hover:border-l-cyan-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-1.5">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Prospect</span>
-          <i class="fa-solid fa-file-signature text-cyan-400 text-xs sm:text-sm"></i>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <span id="kpiActiveProspects" class="text-xl sm:text-2xl font-bold text-white">0</span>
-          <span class="text-[9px] sm:text-[10px] text-cyan-400 font-medium">Ada SPH</span>
-        </div>
-      </div>
-
-      <!-- Active Leads -->
-      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-indigo-500 hover:border-l-indigo-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-1.5">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Leads</span>
-          <i class="fa-solid fa-bullseye text-indigo-400 text-xs sm:text-sm"></i>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <span id="kpiActiveLeads" class="text-xl sm:text-2xl font-bold text-white">0</span>
-          <span class="text-[9px] sm:text-[10px] text-indigo-400 font-medium">Contact</span>
-        </div>
-      </div>
-
-      <!-- Deal / Won -->
-      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-emerald-500 hover:border-l-emerald-400 transition">
-        <div class="flex items-center justify-between text-slate-400 mb-1.5">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Deal / Won</span>
-          <i class="fa-solid fa-circle-check text-emerald-400 text-xs sm:text-sm"></i>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <span id="kpiDealWon" class="text-xl sm:text-2xl font-bold text-emerald-400">0</span>
-          <span class="text-[9px] sm:text-[10px] text-emerald-400 font-medium">Closing</span>
-        </div>
-      </div>
-
-      <!-- Alert Overdue -->
-      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-rose-500 hover:border-l-rose-400 transition bg-rose-950/10">
-        <div class="flex items-center justify-between text-slate-400 mb-1.5">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-rose-300">Overdue</span>
-          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs sm:text-sm animate-bounce"></i>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <span id="kpiOverdue" class="text-xl sm:text-2xl font-bold text-rose-400">0</span>
-          <span class="text-[9px] sm:text-[10px] text-rose-300 font-semibold bg-rose-500/20 px-1 py-0.5 rounded">>14 Hari</span>
-        </div>
-      </div>
-
-      <!-- Alert Warning -->
-      <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col justify-between border-l-4 border-l-amber-500 hover:border-l-amber-400 transition bg-amber-950/10">
-        <div class="flex items-center justify-between text-slate-400 mb-1.5">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-amber-300">Warning</span>
-          <i class="fa-solid fa-clock text-amber-400 text-xs sm:text-sm"></i>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <span id="kpiWarning" class="text-xl sm:text-2xl font-bold text-amber-400">0</span>
-          <span class="text-[9px] sm:text-[10px] text-amber-300 font-medium">7-14 Hari</span>
-        </div>
-      </div>
-
+    <!-- BANNER UTAMA -->
+    <section class="hero" id="beranda">
+        <h2>Selamat Datang di Website Saya!</h2>
+        <p>Ini adalah struktur dasar halaman utama yang sudah rapi. Kamu tinggal mengganti tulisan di dalamnya sesuai keinginan.</p>
+        <a href="#tentang" class="btn">Pelajari Lebih Lanjut</a>
     </section>
 
-    <!-- Analytics Charts Section -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-      
-      <!-- Chart 1: Status Distribution -->
-      <div class="lg:col-span-5 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <h2 class="text-sm sm:text-base font-semibold text-slate-100">Distribusi Progress Customer</h2>
-            <p class="text-[11px] sm:text-xs text-slate-400">Persentase tahapan prospek</p>
-          </div>
-          <div class="p-1.5 sm:p-2 rounded-lg bg-slate-800 text-slate-400">
-            <i class="fa-solid fa-chart-pie text-xs sm:text-sm"></i>
-          </div>
-        </div>
-        <div class="relative h-48 sm:h-60 w-full flex items-center justify-center">
-          <canvas id="statusDonutChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Chart 2: Alert & Progress per Sales Officer -->
-      <div class="lg:col-span-7 glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <h2 class="text-sm sm:text-base font-semibold text-slate-100">Performance Sales Officer</h2>
-            <p class="text-[11px] sm:text-xs text-slate-400">Customer & alert overdue per sales</p>
-          </div>
-          <div class="p-1.5 sm:p-2 rounded-lg bg-slate-800 text-slate-400">
-            <i class="fa-solid fa-chart-column text-xs sm:text-sm"></i>
-          </div>
-        </div>
-        <div class="relative h-48 sm:h-60 w-full">
-          <canvas id="salesBarChart"></canvas>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Filters & Controls Bar -->
-    <section class="glass-card rounded-xl sm:rounded-2xl p-3.5 sm:p-4 space-y-3 sm:space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-        <div>
-          <h2 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-blue-400"></i>
-            Daftar Prioritas & Database
-          </h2>
-          <p class="text-[11px] sm:text-xs text-slate-400">Otomatis terurut berdasarkan urgensi follow-up</p>
-        </div>
-
-        <div class="text-[11px] sm:text-xs bg-slate-800/80 border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-info-circle text-blue-400 flex-shrink-0"></i>
-          <span class="truncate">Format Note: <strong class="text-slate-100">[Unit & Qty] _ [Masa Sewa] _ [Catatan]</strong></span>
-        </div>
-      </div>
-
-      <!-- Filter Controls Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-        <!-- Search Input -->
-        <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
-          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari nama PT / ID / Note..." 
-                 class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
-        </div>
-
-        <!-- Filter Sales Officer -->
-        <div>
-          <select id="filterSales" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
-            <option value="ALL">Semua Sales Officer</option>
-          </select>
-        </div>
-
-        <!-- Filter Alert Status -->
-        <div>
-          <select id="filterAlert" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
-            <option value="ALL">Semua Status Alert</option>
-            <option value="OVERDUE">🔴 Overdue (>14 Hari / Idle)</option>
-            <option value="WARNING">🟡 Warning (7-14 Hari)</option>
-            <option value="SAFE">🟢 Safe / Active</option>
-          </select>
-        </div>
-
-        <!-- Filter Last Progress -->
-        <div>
-          <select id="filterProgress" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
-            <option value="ALL">Semua Progress</option>
-            <option value="Leads">Leads</option>
-            <option value="Prospect">Prospect</option>
-            <option value="Deal / Won">Deal / Won</option>
-            <option value="Lost">Lost</option>
-            <option value="Idle">Idle</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- Table Container -->
-    <section class="glass-card rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800">
-      <div class="overflow-x-auto custom-scrollbar">
-        <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[750px]">
-          <thead class="bg-slate-900/90 text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
-            <tr>
-              <th class="py-3 px-3 sm:px-4">Perusahaan & Project ID</th>
-              <th class="py-3 px-3 sm:px-4">Sales Officer</th>
-              <th class="py-3 px-3 sm:px-4">Last Contact</th>
-              <th class="py-3 px-3 sm:px-4">Follow-Up</th>
-              <th class="py-3 px-3 sm:px-4">Progress</th>
-              <th class="py-3 px-3 sm:px-4">Alert Status</th>
-              <th class="py-3 px-3 sm:px-4 min-w-[240px]">Detail Note & Progress</th>
-              <th class="py-3 px-3 sm:px-4 text-center">Aksi Cepat</th>
-            </tr>
-          </thead>
-          <tbody id="companyTableBody" class="divide-y divide-slate-800/60 font-normal">
-            <!-- Dynamic Rows rendered via JS -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Empty State -->
-      <div id="emptyState" class="hidden p-8 text-center text-slate-400">
-        <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-600"></i>
-        <p class="text-sm font-medium text-slate-300">Tidak ada data customer yang sesuai filter.</p>
-        <p class="text-xs text-slate-500 mt-1">Coba ubah kata kunci atau pilihan filter Anda.</p>
-      </div>
-
-      <!-- Footer Info -->
-      <div class="px-3 sm:px-4 py-2.5 bg-slate-900/50 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-slate-400 gap-1.5">
-        <div>
-          Menampilkan <span id="showingCount" class="font-semibold text-slate-200">0</span> dari <span id="totalCount" class="font-semibold text-slate-200">0</span> perusahaan
-        </div>
-        <button onclick="fetchGoogleSheetsData()" class="hover:underline text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
-          <i class="fa-solid fa-rotate text-[10px]"></i> Sync Ulang Sheet
-        </button>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- MODAL 1: Connect Google Sheets & Apps Script -->
-  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-    <div class="glass-card rounded-xl sm:rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
-          <i class="fa-solid fa-file-csv text-emerald-400"></i>
-          Hubungkan Google Sheets & Web App
-        </h3>
-        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-200 p-1">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-xs text-slate-300">
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">1. URL CSV Google Sheets (Untuk Baca Data):</label>
-          <input type="url" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" 
-                 class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">2. URL Web App Google Apps Script (Untuk Simpan/Edit/Hapus):</label>
-          <input type="url" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/.../exec" 
-                 class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500">
-          <p class="text-[10px] text-slate-400 mt-1">Dapatkan URL ini setelah Anda menekan tombol <b>Deploy > New deployment</b> di Google Apps Script.</p>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="closeSyncModal()" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
-          Batal
-        </button>
-        <button onclick="saveSyncSettingsAndFetch()" class="px-4 py-2 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1.5">
-          <i class="fa-solid fa-sync"></i>
-          Simpan & Tarik Data
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL 2: Add / Edit Company Data -->
-  <div id="companyModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-    <div class="glass-card rounded-xl sm:rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3.5 border border-slate-700 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="modalTitle" class="text-sm sm:text-base font-semibold text-slate-100">Tambah Data Customer</h3>
-        <button onclick="closeCompanyModal()" class="text-slate-400 hover:text-slate-200 p-1">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <form id="companyForm" onsubmit="saveCompanyData(event)" class="space-y-3 text-xs">
-        <input type="hidden" id="formRowId">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div>
-            <label class="block font-medium text-slate-300 mb-1">Nama Perusahaan *</label>
-            <input type="text" id="formCompanyName" required placeholder="PT Petrokimia Utama" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block font-medium text-slate-300 mb-1">Company ID / Ref</label>
-            <input type="text" id="formCompanyId" placeholder="CMP-088" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div>
-            <label class="block font-medium text-slate-300 mb-1">Sales Officer *</label>
-            <input type="text" id="formSalesOfficer" required placeholder="Nama Sales" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block font-medium text-slate-300 mb-1">Project ID Terakhir *</label>
-            <input type="text" id="formProjectId" required placeholder="PRJ-2026-001" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div>
-            <label class="block font-medium text-slate-300 mb-1">Tanggal Last Follow-up *</label>
-            <input type="date" id="formLastFollowUp" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block font-medium text-slate-300 mb-1">Last Progress Status *</label>
-            <select id="formLastProgress" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-blue-500 focus:outline-none">
-              <option value="Leads">Leads</option>
-              <option value="Prospect">Prospect</option>
-              <option value="Deal / Won">Deal / Won</option>
-              <option value="Lost">Lost</option>
-              <option value="Idle">Idle</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Structured Note Section -->
-        <div class="p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2">
-          <span class="block text-[11px] font-semibold text-blue-400">Penyusunan Catatan Detail Note</span>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Jenis & Qty Unit</label>
-              <input type="text" id="formUnitQty" placeholder="Forklift 3 Ton (2 Unit)" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Masa Sewa</label>
-              <input type="text" id="formMasaSewa" placeholder="2 Tahun" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
-            </div>
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5">Catatan Progress Terbaru</label>
-            <input type="text" id="formCatatanStatus" placeholder="SPH dikirim ke user, menunggu visit" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-blue-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" onclick="closeCompanyModal()" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
-            Batal
-          </button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white">
-            Simpan Data
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    // URL Default CSV Google Sheets
-    const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSm4xVtrZqQPMWjlsdc6rbkfTBDYLnnD1IUfOwPJq5NKQRLT9noTfMreOfmefZhZ0P6zmRwuFivUuFG/pub?gid=1972181690&single=true&output=csv";
-
-    let masterData = [];
-    let filteredData = [];
-    let donutChartInstance = null;
-    let barChartInstance = null;
-
-    function getRelativeDateStr(daysAgo) {
-      const d = new Date();
-      d.setDate(d.getDate() - daysAgo);
-      return d.toISOString().split('T')[0];
-    }
-
-    function computeDaysSince(dateStr) {
-      if (!dateStr) return 0;
-      const today = new Date();
-      const past = new Date(dateStr);
-      const diffTime = today - past;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      return isNaN(diffDays) || diffDays < 0 ? 0 : diffDays;
-    }
-
-    function computeAlertStatus(lastProgress, daysSince) {
-      if (lastProgress === "Deal / Won") return "DEAL CLOSED";
-      if (lastProgress === "Lost" || lastProgress === "Idle") return "IDLE / INACTIVE";
-      
-      if (daysSince > 14) {
-        return "OVERDUE (IDLE)";
-      } else if (daysSince >= 7 && daysSince <= 14) {
-        return "WARNING (7-14 Days)";
-      } else {
-        return "SAFE / ON TRACK";
-      }
-    }
-
-    window.onload = function() {
-      initCharts();
-      fetchGoogleSheetsData(null, true);
-    };
-
-    function saveMasterData() {
-      localStorage.setItem('sales_dashboard_master_data', JSON.stringify(masterData));
-    }
-
-    // Fungsi Pengiriman Otomatis ke Google Apps Script (Web App)
-    function sendToGoogleScript(payload) {
-      const webAppUrl = localStorage.getItem('gas_web_app_url');
-      if (!webAppUrl) {
-        console.warn("URL Web App Google Apps Script belum diisi di menu 'Hubungkan Sheet'. Perubahan disimpan lokal.");
-        return;
-      }
-
-      fetch(webAppUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        console.log('Perubahan berhasil dikirim ke Google Sheet via Google Apps Script:', payload);
-      })
-      .catch(err => {
-        console.error('Gagal mengirim ke Google Apps Script:', err);
-      });
-    }
-
-    function populateSalesDropdown() {
-      const salesSet = new Set(masterData.map(item => item.salesOfficer).filter(Boolean));
-      const select = document.getElementById('filterSales');
-      
-      const currentVal = select.value;
-      select.innerHTML = '<option value="ALL">Semua Sales Officer</option>';
-      
-      salesSet.forEach(sales => {
-        const opt = document.createElement('option');
-        opt.value = sales;
-        opt.textContent = sales;
-        select.appendChild(opt);
-      });
-
-      select.value = currentVal;
-    }
-
-    function applyFilters() {
-      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
-      const salesVal = document.getElementById('filterSales').value;
-      const alertVal = document.getElementById('filterAlert').value;
-      const progressVal = document.getElementById('filterProgress').value;
-
-      filteredData = masterData.filter(item => {
-        const daysSince = computeDaysSince(item.lastFollowUp);
-        const alertStatus = computeAlertStatus(item.lastProgress, daysSince);
-
-        const matchSearch = !searchVal || 
-          (item.companyName && item.companyName.toLowerCase().includes(searchVal)) ||
-          (item.companyId && item.companyId.toLowerCase().includes(searchVal)) ||
-          (item.projectId && item.projectId.toLowerCase().includes(searchVal)) ||
-          (item.noteStatus && item.noteStatus.toLowerCase().includes(searchVal));
-
-        const matchSales = (salesVal === 'ALL') || (item.salesOfficer === salesVal);
-        const matchProgress = (progressVal === 'ALL') || (item.lastProgress === progressVal);
-
-        let matchAlert = true;
-        if (alertVal === 'OVERDUE') {
-          matchAlert = alertStatus.includes('OVERDUE');
-        } else if (alertVal === 'WARNING') {
-          matchAlert = alertStatus.includes('WARNING');
-        } else if (alertVal === 'SAFE') {
-          matchAlert = alertStatus.includes('SAFE') || alertStatus.includes('DEAL');
-        }
-
-        return matchSearch && matchSales && matchProgress && matchAlert;
-      });
-
-      filteredData.sort((a, b) => {
-        const daysA = computeDaysSince(a.lastFollowUp);
-        const daysB = computeDaysSince(b.lastFollowUp);
-        return daysB - daysA;
-      });
-
-      updateKPIs();
-      renderTable();
-      updateCharts();
-    }
-
-    function updateKPIs() {
-      const totalCompanies = masterData.length;
-      let activeProspects = 0;
-      let activeLeads = 0;
-      let dealWon = 0;
-      let countOverdue = 0;
-      let countWarning = 0;
-
-      masterData.forEach(item => {
-        const days = computeDaysSince(item.lastFollowUp);
-        const alert = computeAlertStatus(item.lastProgress, days);
-
-        if (item.lastProgress === 'Prospect') activeProspects++;
-        if (item.lastProgress === 'Leads') activeLeads++;
-        if (item.lastProgress === 'Deal / Won') dealWon++;
-
-        if (alert.includes('OVERDUE')) countOverdue++;
-        if (alert.includes('WARNING')) countWarning++;
-      });
-
-      document.getElementById('kpiTotalCompanies').textContent = totalCompanies;
-      document.getElementById('kpiActiveProspects').textContent = activeProspects;
-      document.getElementById('kpiActiveLeads').textContent = activeLeads;
-      document.getElementById('kpiDealWon').textContent = dealWon;
-      document.getElementById('kpiOverdue').textContent = countOverdue;
-      document.getElementById('kpiWarning').textContent = countWarning;
-
-      document.getElementById('showingCount').textContent = filteredData.length;
-      document.getElementById('totalCount').textContent = totalCompanies;
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById('companyTableBody');
-      const emptyState = document.getElementById('emptyState');
-
-      tbody.innerHTML = '';
-
-      if (filteredData.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
-      } else {
-        emptyState.classList.add('hidden');
-      }
-
-      filteredData.forEach(item => {
-        const daysSince = computeDaysSince(item.lastFollowUp);
-        const alertStatus = computeAlertStatus(item.lastProgress, daysSince);
-
-        let alertBadgeHTML = '';
-        if (alertStatus.includes('OVERDUE')) {
-          alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
-              OVERDUE (>14h)
-            </span>`;
-        } else if (alertStatus.includes('WARNING')) {
-          alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <i class="fa-solid fa-triangle-exclamation text-[9px]"></i>
-              WARNING (7-14h)
-            </span>`;
-        } else if (alertStatus.includes('DEAL')) {
-          alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i class="fa-solid fa-check text-[9px]"></i>
-              DEAL WON
-            </span>`;
-        } else {
-          alertBadgeHTML = `
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
-              SAFE / ON TRACK
-            </span>`;
-        }
-
-        let progressBadgeHTML = '';
-        if (item.lastProgress === 'Prospect') {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Prospect</span>`;
-        } else if (item.lastProgress === 'Leads') {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Leads</span>`;
-        } else if (item.lastProgress === 'Deal / Won') {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Deal / Won</span>`;
-        } else {
-          progressBadgeHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-400 border border-slate-700">${item.lastProgress || 'Idle'}</span>`;
-        }
-
-        const formattedNote = `${item.noteUnit || 'Unit -'} _ ${item.noteMasaSewa || 'Sewa -'} _ ${item.noteStatus || 'Belum ada catatan'}`;
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-900/60 transition group";
-
-        tr.innerHTML = `
-          <td class="py-3 px-3 sm:px-4">
-            <div class="font-semibold text-slate-100 group-hover:text-blue-400 transition">${item.companyName}</div>
-            <div class="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-              <span>${item.companyId || 'No ID'}</span>
-              <span>•</span>
-              <span class="text-slate-300 font-mono">${item.projectId || '-'}</span>
-            </div>
-          </td>
-          <td class="py-3 px-3 sm:px-4 font-medium text-slate-200">
-            <div class="flex items-center gap-1.5">
-              <div class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[9px] font-bold text-blue-400">
-                ${(item.salesOfficer || 'S').charAt(0)}
-              </div>
-              <span>${item.salesOfficer}</span>
-            </div>
-          </td>
-          <td class="py-3 px-3 sm:px-4 text-xs text-slate-300">
-            ${item.lastFollowUp || '-'}
-          </td>
-          <td class="py-3 px-3 sm:px-4">
-            <div class="flex items-center gap-1">
-              <span class="font-bold ${daysSince > 14 ? 'text-rose-400' : daysSince >= 7 ? 'text-amber-400' : 'text-slate-200'}">${daysSince}h</span>
-              <span class="text-[10px] text-slate-500">lalu</span>
-            </div>
-          </td>
-          <td class="py-3 px-3 sm:px-4">
-            ${progressBadgeHTML}
-          </td>
-          <td class="py-3 px-3 sm:px-4">
-            ${alertBadgeHTML}
-          </td>
-          <td class="py-3 px-3 sm:px-4">
-            <div class="text-[11px] text-slate-300 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800/80 leading-relaxed font-mono">
-              ${formattedNote}
-            </div>
-          </td>
-          <td class="py-3 px-3 sm:px-4 text-center">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="quickUpdateFollowUp(${item.id})" title="Update Follow-Up Hari Ini" class="p-1.5 rounded-lg bg-slate-800 hover:bg-emerald-600/20 text-slate-400 hover:text-emerald-400 transition border border-slate-700">
-                <i class="fa-solid fa-calendar-check text-xs"></i>
-              </button>
-              <button onclick="editCompany(${item.id})" title="Edit Detail Data" class="p-1.5 rounded-lg bg-slate-800 hover:bg-blue-600/20 text-slate-400 hover:text-blue-400 transition border border-slate-700">
-                <i class="fa-solid fa-pen text-xs"></i>
-              </button>
-              <button onclick="deleteCompany(${item.id})" title="Hapus" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-600/20 text-slate-400 hover:text-rose-400 transition border border-slate-700">
-                <i class="fa-solid fa-trash text-xs"></i>
-              </button>
-            </div>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function quickUpdateFollowUp(id) {
-      const item = masterData.find(d => d.id === id);
-      if (item) {
-        const todayStr = new Date().toISOString().split('T')[0];
-        item.lastFollowUp = todayStr;
-        saveMasterData();
-        applyFilters();
-
-        // Kirim update cepat ke Google Sheets
-        sendToGoogleScript({
-          action: 'QUICK_UPDATE',
-          companyId: item.companyId,
-          projectId: item.projectId,
-          lastFollowUp: todayStr
-        });
-      }
-    }
-
-    function deleteCompany(id) {
-      const item = masterData.find(d => d.id === id);
-      if (item && confirm('Apakah Anda yakin ingin menghapus data customer ini dari Dashboard dan Google Sheet?')) {
-        const payload = {
-          action: 'DELETE',
-          companyId: item.companyId,
-          projectId: item.projectId
-        };
-
-        masterData = masterData.filter(d => d.id !== id);
-        saveMasterData();
-        populateSalesDropdown();
-        applyFilters();
-
-        // Kirim instruksi hapus ke Google Sheets
-        sendToGoogleScript(payload);
-      }
-    }
-
-    function initCharts() {
-      const donutCtx = document.getElementById('statusDonutChart').getContext('2d');
-      donutChartInstance = new Chart(donutCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Leads', 'Prospect', 'Deal / Won', 'Lost / Idle'],
-          datasets: [{
-            data: [0, 0, 0, 0],
-            backgroundColor: ['#6366f1', '#06b6d4', '#10b981', '#64748b'],
-            borderWidth: 0,
-            hoverOffset: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                color: '#94a3b8',
-                font: { size: 10, family: 'Inter' },
-                padding: 10,
-                usePointStyle: true
-              }
-            }
-          },
-          cutout: '68%'
-        }
-      });
-
-      const barCtx = document.getElementById('salesBarChart').getContext('2d');
-      barChartInstance = new Chart(barCtx, {
-        type: 'bar',
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: 'Active (Leads/Prospect)',
-              data: [],
-              backgroundColor: '#3b82f6',
-              borderRadius: 4
-            },
-            {
-              label: 'Overdue (>14h)',
-              data: [],
-              backgroundColor: '#f43f5e',
-              borderRadius: 4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: '#94a3b8', font: { size: 10 } }
-            },
-            y: {
-              grid: { color: 'rgba(51, 65, 85, 0.4)' },
-              ticks: { color: '#94a3b8', font: { size: 10 }, precision: 0 },
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: { color: '#94a3b8', font: { size: 10 }, usePointStyle: true }
-            }
-          }
-        }
-      });
-    }
-
-    function updateCharts() {
-      if (!donutChartInstance || !barChartInstance) return;
-
-      let leads = 0, prospect = 0, deal = 0, other = 0;
-      masterData.forEach(item => {
-        if (item.lastProgress === 'Leads') leads++;
-        else if (item.lastProgress === 'Prospect') prospect++;
-        else if (item.lastProgress === 'Deal / Won') deal++;
-        else other++;
-      });
-
-      donutChartInstance.data.datasets[0].data = [leads, prospect, deal, other];
-      donutChartInstance.update();
-
-      const salesMap = {};
-      masterData.forEach(item => {
-        const sales = item.salesOfficer || 'Unassigned';
-        if (!salesMap[sales]) {
-          salesMap[sales] = { active: 0, overdue: 0 };
-        }
+    <!-- KONTEN UTAMA -->
+    <main class="container" id="tentang">
+        <h2 style="color: #2c3e50;">Fitur Utama</h2>
         
-        const days = computeDaysSince(item.lastFollowUp);
-        const alert = computeAlertStatus(item.lastProgress, days);
+        <div class="cards">
+            <div class="card">
+                <h3>🚀 Cepat & Ringan</h3>
+                <p>Desain dibuat sederhana tanpa file CSS terpisah agar kamu tidak pusing mengelola folder.</p>
+            </div>
+            <div class="card">
+                <h3>📱 Responsif</h3>
+                <p>Tampilan otomatis menyesuaikan ukuran layar HP, tablet, maupun laptop.</p>
+            </div>
+            <div class="card">
+                <h3>✏️ Mudah Diedit</h3>
+                <p>Cukup ganti teks yang berada di antara tag HTML seperti ini.</p>
+            </div>
+        </div>
+    </main>
 
-        if (item.lastProgress === 'Leads' || item.lastProgress === 'Prospect') {
-          salesMap[sales].active++;
-        }
-        if (alert.includes('OVERDUE')) {
-          salesMap[sales].overdue++;
-        }
-      });
+    <!-- FOOTER / BAGIAN BAWAH -->
+    <footer>
+        <p>&copy; 2026 Website Saya. Dibuat dari awal.</p>
+    </footer>
 
-      const salesNames = Object.keys(salesMap);
-      const activeCounts = salesNames.map(s => salesMap[s].active);
-      const overdueCounts = salesNames.map(s => salesMap[s].overdue);
-
-      barChartInstance.data.labels = salesNames;
-      barChartInstance.data.datasets[0].data = activeCounts;
-      barChartInstance.data.datasets[1].data = overdueCounts;
-      barChartInstance.update();
-    }
-
-    function openSyncModal() {
-      const inputEl = document.getElementById('sheetUrlInput');
-      if (inputEl) {
-        inputEl.value = localStorage.getItem('gas_sheet_url') || DEFAULT_SHEET_URL;
-      }
-      const webAppEl = document.getElementById('webAppUrlInput');
-      if (webAppEl) {
-        webAppEl.value = localStorage.getItem('gas_web_app_url') || '';
-      }
-      document.getElementById('syncModal').classList.remove('hidden');
-    }
-
-    function closeSyncModal() {
-      document.getElementById('syncModal').classList.add('hidden');
-    }
-
-    function saveSyncSettingsAndFetch() {
-      const inputEl = document.getElementById('sheetUrlInput');
-      const webAppEl = document.getElementById('webAppUrlInput');
-
-      if (inputEl && inputEl.value.trim()) {
-        localStorage.setItem('gas_sheet_url', inputEl.value.trim());
-      }
-      if (webAppEl && webAppEl.value.trim()) {
-        localStorage.setItem('gas_web_app_url', webAppEl.value.trim());
-      }
-
-      fetchGoogleSheetsData(inputEl.value.trim(), false);
-    }
-
-    function openAddModal() {
-      document.getElementById('modalTitle').textContent = 'Tambah Data Customer';
-      document.getElementById('companyForm').reset();
-      document.getElementById('formRowId').value = '';
-      document.getElementById('formLastFollowUp').value = new Date().toISOString().split('T')[0];
-      document.getElementById('companyModal').classList.remove('hidden');
-    }
-
-    function closeCompanyModal() {
-      document.getElementById('companyModal').classList.add('hidden');
-    }
-
-    function editCompany(id) {
-      const item = masterData.find(d => d.id === id);
-      if (!item) return;
-
-      document.getElementById('modalTitle').textContent = 'Edit Data Customer';
-      document.getElementById('formRowId').value = item.id;
-      document.getElementById('formCompanyName').value = item.companyName || '';
-      document.getElementById('formCompanyId').value = item.companyId || '';
-      document.getElementById('formSalesOfficer').value = item.salesOfficer || '';
-      document.getElementById('formProjectId').value = item.projectId || '';
-      document.getElementById('formLastFollowUp').value = item.lastFollowUp || '';
-      document.getElementById('formLastProgress').value = item.lastProgress || 'Leads';
-      document.getElementById('formUnitQty').value = item.noteUnit || '';
-      document.getElementById('formMasaSewa').value = item.noteMasaSewa || '';
-      document.getElementById('formCatatanStatus').value = item.noteStatus || '';
-
-      document.getElementById('companyModal').classList.remove('hidden');
-    }
-
-    function saveCompanyData(e) {
-      e.preventDefault();
-      const id = document.getElementById('formRowId').value;
-
-      const companyName = document.getElementById('formCompanyName').value.trim();
-      const companyId = document.getElementById('formCompanyId').value.trim();
-      const salesOfficer = document.getElementById('formSalesOfficer').value.trim();
-      const projectId = document.getElementById('formProjectId').value.trim();
-      const lastFollowUp = document.getElementById('formLastFollowUp').value;
-      const lastProgress = document.getElementById('formLastProgress').value;
-      const noteUnit = document.getElementById('formUnitQty').value.trim();
-      const noteMasaSewa = document.getElementById('formMasaSewa').value.trim();
-      const noteStatus = document.getElementById('formCatatanStatus').value.trim();
-
-      const payload = {
-        action: id ? 'EDIT' : 'ADD',
-        companyId: companyId,
-        companyName: companyName,
-        salesOfficer: salesOfficer,
-        projectId: projectId,
-        lastFollowUp: lastFollowUp,
-        lastProgress: lastProgress,
-        noteUnit: noteUnit,
-        noteMasaSewa: noteMasaSewa,
-        noteStatus: noteStatus
-      };
-
-      if (id) {
-        const item = masterData.find(d => d.id === parseInt(id));
-        if (item) {
-          item.companyName = companyName;
-          item.companyId = companyId;
-          item.salesOfficer = salesOfficer;
-          item.projectId = projectId;
-          item.lastFollowUp = lastFollowUp;
-          item.lastProgress = lastProgress;
-          item.noteUnit = noteUnit;
-          item.noteMasaSewa = noteMasaSewa;
-          item.noteStatus = noteStatus;
-        }
-      } else {
-        const newObj = {
-          id: Date.now(),
-          companyId: companyId || `CMP-${Math.floor(100 + Math.random() * 900)}`,
-          companyName,
-          salesOfficer,
-          projectId,
-          lastFollowUp,
-          lastProgress,
-          noteUnit,
-          noteMasaSewa,
-          noteStatus
-        };
-        masterData.unshift(newObj);
-      }
-
-      saveMasterData();
-      populateSalesDropdown();
-      applyFilters();
-      closeCompanyModal();
-
-      // Kirim data ke Google Apps Script secara real-time
-      sendToGoogleScript(payload);
-    }
-
-    function fetchGoogleSheetsData(targetUrl = null, isAutoLoad = false) {
-      const savedSheetUrl = localStorage.getItem('gas_sheet_url');
-      const url = targetUrl || savedSheetUrl || DEFAULT_SHEET_URL;
-
-      Papa.parse(url, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          if (results.data && results.data.length > 0) {
-            const parsedList = [];
-            results.data.forEach((row, idx) => {
-              const companyName = row['Nama Perusahaan'] || row['Company Name'] || row['Nama Customer'] || row['Company'] || Object.values(row)[0] || '';
-              if (!companyName) return;
-
-              parsedList.push({
-                id: idx + 1,
-                companyId: row['Company ID'] || row['ID Customer'] || row['ID Perusahaan'] || `CMP-${String(idx+1).padStart(3, '0')}`,
-                companyName: companyName,
-                salesOfficer: row['Sales Officer'] || row['PIC Sales'] || row['Sales'] || row['Officer'] || 'Sales',
-                projectId: row['Project ID'] || row['Last Project ID'] || row['ID Project'] || `PRJ-${idx+1}`,
-                lastFollowUp: row['Tgl Last Follow-up'] || row['Last Contact'] || row['Tanggal Follow Up'] || row['Tanggal'] || getRelativeDateStr(0),
-                lastProgress: row['Last Progress'] || row['Status'] || row['Progress'] || 'Leads',
-                noteUnit: row['Unit & Qty'] || row['Unit'] || row['Jenis Unit'] || '',
-                noteMasaSewa: row['Masa Sewa'] || row['Sewa'] || row['Durasi'] || '',
-                noteStatus: row['Catatan Progress'] || row['Detail Note'] || row['Catatan'] || row['Note'] || ''
-              });
-            });
-
-            if (parsedList.length > 0) {
-              masterData = parsedList;
-              saveMasterData();
-              populateSalesDropdown();
-              applyFilters();
-              
-              if (!isAutoLoad) {
-                closeSyncModal();
-                alert(`Berhasil menarik ${parsedList.length} data customer dari Google Sheets!`);
-              }
-            } else if (!isAutoLoad) {
-              alert('Gagal membaca data dari Sheet. Pastikan format kolom header sesuai.');
-            }
-          }
-        },
-        error: function(err) {
-          console.error('Fetch Google Sheets CSV error:', err);
-          if (!isAutoLoad) {
-            alert('Error saat menarik data Google Sheets. Pastikan link dipublikasikan sebagai CSV.');
-          } else {
-            const saved = localStorage.getItem('sales_dashboard_master_data');
-            if (saved) {
-              try { masterData = JSON.parse(saved); } catch(e) {}
-            }
-            populateSalesDropdown();
-            applyFilters();
-          }
-        }
-      });
-    }
-
-    function exportToCSV() {
-      if (filteredData.length === 0) {
-        alert('Tidak ada data untuk diexport.');
-        return;
-      }
-
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Company ID,Nama Perusahaan,Sales Officer,Project ID,Last Follow-Up,Hari Sejak Contact,Progress,Alert Status,Detail Note\n";
-
-      filteredData.forEach(item => {
-        const days = computeDaysSince(item.lastFollowUp);
-        const alert = computeAlertStatus(item.lastProgress, days);
-        const note = `"${(item.noteUnit || '')} _ ${(item.noteMasaSewa || '')} _ ${(item.noteStatus || '')}"`;
-        const companyName = `"${item.companyName}"`;
-
-        csvContent += `${item.companyId},${companyName},${item.salesOfficer},${item.projectId},${item.lastFollowUp},${days},${item.lastProgress},${alert},${note}\n`;
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Sales_FollowUp_Report_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  </script>
 </body>
 </html>
