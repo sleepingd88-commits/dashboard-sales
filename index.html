@@ -323,7 +323,7 @@
         <div>
           Menampilkan <span id="showingCount" class="font-semibold text-slate-200">0</span> dari <span id="totalCount" class="font-semibold text-slate-200">0</span> perusahaan
         </div>
-        <button onclick="fetchGoogleSheetsData(DEFAULT_SHEET_URL)" class="hover:underline text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+        <button onclick="fetchGoogleSheetsData()" class="hover:underline text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
           <i class="fa-solid fa-rotate text-[10px]"></i> Sync Ulang Sheet
         </button>
       </div>
@@ -331,13 +331,13 @@
 
   </main>
 
-  <!-- MODAL 1: Connect Google Sheets -->
+  <!-- MODAL 1: Connect Google Sheets & Apps Script -->
   <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
     <div class="glass-card rounded-xl sm:rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-2">
           <i class="fa-solid fa-file-csv text-emerald-400"></i>
-          Hubungkan Google Sheets
+          Hubungkan Google Sheets & Web App
         </h3>
         <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-200 p-1">
           <i class="fa-solid fa-xmark text-base"></i>
@@ -346,9 +346,16 @@
 
       <div class="space-y-3 text-xs text-slate-300">
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">URL Google Sheets CSV Terhubung:</label>
+          <label class="block text-xs font-medium text-slate-300 mb-1">1. URL CSV Google Sheets (Untuk Baca Data):</label>
           <input type="url" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" 
                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">2. URL Web App Google Apps Script (Untuk Simpan/Edit/Hapus):</label>
+          <input type="url" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/.../exec" 
+                 class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500">
+          <p class="text-[10px] text-slate-400 mt-1">Dapatkan URL ini setelah Anda menekan tombol <b>Deploy > New deployment</b> di Google Apps Script.</p>
         </div>
       </div>
 
@@ -356,9 +363,9 @@
         <button onclick="closeSyncModal()" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
           Batal
         </button>
-        <button onclick="fetchGoogleSheetsData()" class="px-4 py-2 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1.5">
+        <button onclick="saveSyncSettingsAndFetch()" class="px-4 py-2 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1.5">
           <i class="fa-solid fa-sync"></i>
-          Tarik Data Sekarang
+          Simpan & Tarik Data
         </button>
       </div>
     </div>
@@ -448,7 +455,7 @@
   </div>
 
   <script>
-    // URL CSV Google Sheets Default
+    // URL Default CSV Google Sheets
     const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSm4xVtrZqQPMWjlsdc6rbkfTBDYLnnD1IUfOwPJq5NKQRLT9noTfMreOfmefZhZ0P6zmRwuFivUuFG/pub?gid=1972181690&single=true&output=csv";
 
     let masterData = [];
@@ -486,11 +493,35 @@
 
     window.onload = function() {
       initCharts();
-      fetchGoogleSheetsData(DEFAULT_SHEET_URL, true);
+      fetchGoogleSheetsData(null, true);
     };
 
     function saveMasterData() {
       localStorage.setItem('sales_dashboard_master_data', JSON.stringify(masterData));
+    }
+
+    // Fungsi Pengiriman Otomatis ke Google Apps Script (Web App)
+    function sendToGoogleScript(payload) {
+      const webAppUrl = localStorage.getItem('gas_web_app_url');
+      if (!webAppUrl) {
+        console.warn("URL Web App Google Apps Script belum diisi di menu 'Hubungkan Sheet'. Perubahan disimpan lokal.");
+        return;
+      }
+
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        console.log('Perubahan berhasil dikirim ke Google Sheet via Google Apps Script:', payload);
+      })
+      .catch(err => {
+        console.error('Gagal mengirim ke Google Apps Script:', err);
+      });
     }
 
     function populateSalesDropdown() {
@@ -705,15 +736,33 @@
         item.lastFollowUp = todayStr;
         saveMasterData();
         applyFilters();
+
+        // Kirim update cepat ke Google Sheets
+        sendToGoogleScript({
+          action: 'QUICK_UPDATE',
+          companyId: item.companyId,
+          projectId: item.projectId,
+          lastFollowUp: todayStr
+        });
       }
     }
 
     function deleteCompany(id) {
-      if (confirm('Apakah Anda yakin ingin menghapus data customer ini?')) {
+      const item = masterData.find(d => d.id === id);
+      if (item && confirm('Apakah Anda yakin ingin menghapus data customer ini dari Dashboard dan Google Sheet?')) {
+        const payload = {
+          action: 'DELETE',
+          companyId: item.companyId,
+          projectId: item.projectId
+        };
+
         masterData = masterData.filter(d => d.id !== id);
         saveMasterData();
         populateSalesDropdown();
         applyFilters();
+
+        // Kirim instruksi hapus ke Google Sheets
+        sendToGoogleScript(payload);
       }
     }
 
@@ -836,14 +885,32 @@
 
     function openSyncModal() {
       const inputEl = document.getElementById('sheetUrlInput');
-      if (inputEl && !inputEl.value) {
-        inputEl.value = DEFAULT_SHEET_URL;
+      if (inputEl) {
+        inputEl.value = localStorage.getItem('gas_sheet_url') || DEFAULT_SHEET_URL;
+      }
+      const webAppEl = document.getElementById('webAppUrlInput');
+      if (webAppEl) {
+        webAppEl.value = localStorage.getItem('gas_web_app_url') || '';
       }
       document.getElementById('syncModal').classList.remove('hidden');
     }
 
     function closeSyncModal() {
       document.getElementById('syncModal').classList.add('hidden');
+    }
+
+    function saveSyncSettingsAndFetch() {
+      const inputEl = document.getElementById('sheetUrlInput');
+      const webAppEl = document.getElementById('webAppUrlInput');
+
+      if (inputEl && inputEl.value.trim()) {
+        localStorage.setItem('gas_sheet_url', inputEl.value.trim());
+      }
+      if (webAppEl && webAppEl.value.trim()) {
+        localStorage.setItem('gas_web_app_url', webAppEl.value.trim());
+      }
+
+      fetchGoogleSheetsData(inputEl.value.trim(), false);
     }
 
     function openAddModal() {
@@ -891,6 +958,19 @@
       const noteMasaSewa = document.getElementById('formMasaSewa').value.trim();
       const noteStatus = document.getElementById('formCatatanStatus').value.trim();
 
+      const payload = {
+        action: id ? 'EDIT' : 'ADD',
+        companyId: companyId,
+        companyName: companyName,
+        salesOfficer: salesOfficer,
+        projectId: projectId,
+        lastFollowUp: lastFollowUp,
+        lastProgress: lastProgress,
+        noteUnit: noteUnit,
+        noteMasaSewa: noteMasaSewa,
+        noteStatus: noteStatus
+      };
+
       if (id) {
         const item = masterData.find(d => d.id === parseInt(id));
         if (item) {
@@ -924,16 +1004,14 @@
       populateSalesDropdown();
       applyFilters();
       closeCompanyModal();
+
+      // Kirim data ke Google Apps Script secara real-time
+      sendToGoogleScript(payload);
     }
 
     function fetchGoogleSheetsData(targetUrl = null, isAutoLoad = false) {
-      const inputEl = document.getElementById('sheetUrlInput');
-      const url = targetUrl || (inputEl ? inputEl.value.trim() : DEFAULT_SHEET_URL);
-
-      if (!url) {
-        if (!isAutoLoad) alert('Masukkan URL CSV Google Sheets terlebih dahulu!');
-        return;
-      }
+      const savedSheetUrl = localStorage.getItem('gas_sheet_url');
+      const url = targetUrl || savedSheetUrl || DEFAULT_SHEET_URL;
 
       Papa.parse(url, {
         download: true,
