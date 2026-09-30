@@ -74,7 +74,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari PT / ID..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200">
         <select id="filterSales" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Sales Officer</option></select>
-        <select id="filterAlert" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Status Alert</option><option value="OVERDUE">🔴 Overdue</option><option value="WARNING">🟡 Warning</option><option value="SAFE">🟢 Safe</option></select>
+        <select id="filterAlert" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Status Alert</option><option value="OVERDUE">🔴 Overdue (>14 hari)</option><option value="WARNING">🟡 Warning (7-14 hari)</option><option value="SAFE">🟢 Safe (&lt;7 hari)</option></select>
         <select id="filterProgress" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Progress</option><option value="Leads">Leads</option><option value="Prospect">Prospect</option><option value="Deal / Won">Deal / Won</option><option value="Lost">Lost</option><option value="Idle">Idle</option></select>
       </div>
     </section>
@@ -150,12 +150,11 @@
     window.onload = function() { initCharts(); fetchGoogleSheetsData(null, true); };
     function computeDaysSince(d) { if(!d)return 0; return Math.max(0, Math.floor((new Date() - new Date(d)) / 86400000)); }
 
-    // ====== CORE FIX: FUNGSI PENGIRIMAN KE APPS SCRIPT =======
+    // FUNGSI PENGIRIMAN KE APPS SCRIPT
     function sendToGoogleScript(payload) {
       const webAppUrl = localStorage.getItem('gas_web_app_url');
       if (!webAppUrl) return console.warn("URL Web App kosong.");
 
-      // Kita buang mode 'no-cors' agar frontend bisa membaca response 'sukses/error' dari Google
       fetch(webAppUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -221,7 +220,7 @@
       }
     }
 
-    // ====== MEMBACA DATA 9 HEADER BARU DARI CSV ========
+    // MEMBACA DATA DARI GOOGLE SHEETS VIA CSV
     function fetchGoogleSheetsData(targetUrl = null, isAutoLoad = false) {
       const url = targetUrl || localStorage.getItem('gas_sheet_url');
       if (!url) return;
@@ -257,16 +256,16 @@
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-900/60";
         tr.innerHTML = `
-          <td class="py-3 px-3"><div class="font-semibold text-slate-100">${item.companyName}</div><div class="text-[10px] text-slate-400 mt-0.5">${item.companyId} • ${item.projectId}</div></td>
-          <td class="py-3 px-3 text-slate-200">${item.salesOfficer}</td>
-          <td class="py-3 px-3 text-slate-300">${item.lastFollowUp}<br><span class="text-[10px] ${days>14?'text-rose-400':'text-slate-500'}">${days} hari lalu</span></td>
-          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">${item.lastProgress}</span></td>
+          <td class="py-3 px-3"><div class="font-semibold text-slate-100">${item.companyName}</div><div class="text-[10px] text-slate-400 mt-0.5">${item.companyId || '-'} • ${item.projectId || '-'}</div></td>
+          <td class="py-3 px-3 text-slate-200">${item.salesOfficer || '-'}</td>
+          <td class="py-3 px-3 text-slate-300">${item.lastFollowUp || '-'}<br><span class="text-[10px] ${days>14?'text-rose-400':'text-slate-500'}">${days} hari lalu</span></td>
+          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">${item.lastProgress || 'Idle'}</span></td>
           <td class="py-3 px-3"><span class="px-2 py-0.5 rounded text-[10px] ${days>14?'bg-rose-500/10 text-rose-400':(days>=7?'bg-amber-500/10 text-amber-400':'bg-emerald-500/10 text-emerald-400')}">${days>14?'OVERDUE':(days>=7?'WARNING':'SAFE')}</span></td>
           <td class="py-3 px-3"><div class="text-[11px] text-slate-300 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800/80"><strong class="text-blue-400">${item.noteUnit||'-'}</strong> | ${item.noteMasaSewa||'-'} <br>${item.noteStatus||'-'}</div></td>
           <td class="py-3 px-3 text-center flex gap-1 justify-center mt-2">
-            <button onclick="quickUpdateFollowUp(${item.id})" class="p-1.5 rounded bg-slate-800 text-emerald-400 border border-slate-700"><i class="fa-solid fa-calendar-check"></i></button>
-            <button onclick="editCompany(${item.id})" class="p-1.5 rounded bg-slate-800 text-blue-400 border border-slate-700"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteCompany(${item.id})" class="p-1.5 rounded bg-slate-800 text-rose-400 border border-slate-700"><i class="fa-solid fa-trash"></i></button>
+            <button title="Quick Update Date" onclick="quickUpdateFollowUp(${item.id})" class="p-1.5 rounded bg-slate-800 text-emerald-400 border border-slate-700 hover:bg-slate-700"><i class="fa-solid fa-calendar-check"></i></button>
+            <button title="Edit Data" onclick="editCompany(${item.id})" class="p-1.5 rounded bg-slate-800 text-blue-400 border border-slate-700 hover:bg-slate-700"><i class="fa-solid fa-pen"></i></button>
+            <button title="Hapus Data" onclick="deleteCompany(${item.id})" class="p-1.5 rounded bg-slate-800 text-rose-400 border border-slate-700 hover:bg-slate-700"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -278,11 +277,25 @@
     function applyFilters() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       const sales = document.getElementById('filterSales').value;
+      const alertFilter = document.getElementById('filterAlert').value;
+      const progressFilter = document.getElementById('filterProgress').value;
       
       filteredData = masterData.filter(item => {
-        const mSearch = !search || item.companyName.toLowerCase().includes(search) || item.projectId.toLowerCase().includes(search);
+        const days = computeDaysSince(item.lastFollowUp);
+        let itemAlert = 'SAFE';
+        if (days > 14) itemAlert = 'OVERDUE';
+        else if (days >= 7) itemAlert = 'WARNING';
+
+        const mSearch = !search || 
+          (item.companyName && item.companyName.toLowerCase().includes(search)) || 
+          (item.companyId && item.companyId.toLowerCase().includes(search)) ||
+          (item.projectId && item.projectId.toLowerCase().includes(search));
+
         const mSales = sales === 'ALL' || item.salesOfficer === sales;
-        return mSearch && mSales;
+        const mAlert = alertFilter === 'ALL' || itemAlert === alertFilter;
+        const mProgress = progressFilter === 'ALL' || item.lastProgress === progressFilter;
+
+        return mSearch && mSales && mAlert && mProgress;
       }).sort((a, b) => computeDaysSince(b.lastFollowUp) - computeDaysSince(a.lastFollowUp));
       
       updateKPIs(); renderTable(); updateCharts();
@@ -290,16 +303,21 @@
 
     function updateKPIs() {
       document.getElementById('kpiTotalCompanies').textContent = masterData.length;
-      document.getElementById('kpiOverdue').textContent = masterData.filter(d => computeDaysSince(d.lastFollowUp) > 14).length;
+      document.getElementById('kpiActiveProspects').textContent = masterData.filter(d => d.lastProgress === 'Prospect').length;
       document.getElementById('kpiActiveLeads').textContent = masterData.filter(d => d.lastProgress === 'Leads').length;
       document.getElementById('kpiDealWon').textContent = masterData.filter(d => d.lastProgress === 'Deal / Won').length;
+      document.getElementById('kpiOverdue').textContent = masterData.filter(d => computeDaysSince(d.lastFollowUp) > 14).length;
+      document.getElementById('kpiWarning').textContent = masterData.filter(d => {
+        const days = computeDaysSince(d.lastFollowUp);
+        return days >= 7 && days <= 14;
+      }).length;
     }
 
     function populateSalesDropdown() {
       const sel = document.getElementById('filterSales');
       const val = sel.value;
       sel.innerHTML = '<option value="ALL">Semua Sales Officer</option>';
-      [...new Set(masterData.map(d => d.salesOfficer))].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+      [...new Set(masterData.map(d => d.salesOfficer).filter(Boolean))].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
       sel.value = val;
     }
 
@@ -307,15 +325,15 @@
       const item = masterData.find(d => d.id == id);
       if(!item) return;
       document.getElementById('formRowId').value = item.id;
-      document.getElementById('formCompanyId').value = item.companyId;
-      document.getElementById('formCompanyName').value = item.companyName;
-      document.getElementById('formSalesOfficer').value = item.salesOfficer;
-      document.getElementById('formProjectId').value = item.projectId;
-      document.getElementById('formLastFollowUp').value = item.lastFollowUp;
-      document.getElementById('formLastProgress').value = item.lastProgress;
-      document.getElementById('formUnitQty').value = item.noteUnit;
-      document.getElementById('formMasaSewa').value = item.noteMasaSewa;
-      document.getElementById('formCatatanStatus').value = item.noteStatus;
+      document.getElementById('formCompanyId').value = item.companyId || '';
+      document.getElementById('formCompanyName').value = item.companyName || '';
+      document.getElementById('formSalesOfficer').value = item.salesOfficer || '';
+      document.getElementById('formProjectId').value = item.projectId || '';
+      document.getElementById('formLastFollowUp').value = item.lastFollowUp || '';
+      document.getElementById('formLastProgress').value = item.lastProgress || 'Leads';
+      document.getElementById('formUnitQty').value = item.noteUnit || '';
+      document.getElementById('formMasaSewa').value = item.noteMasaSewa || '';
+      document.getElementById('formCatatanStatus').value = item.noteStatus || '';
       document.getElementById('modalTitle').textContent = 'Edit Data';
       document.getElementById('companyModal').classList.remove('hidden');
     }
@@ -329,11 +347,13 @@
     }
     
     function closeCompanyModal() { document.getElementById('companyModal').classList.add('hidden'); }
+    
     function openSyncModal() {
       document.getElementById('sheetUrlInput').value = localStorage.getItem('gas_sheet_url') || '';
       document.getElementById('webAppUrlInput').value = localStorage.getItem('gas_web_app_url') || '';
       document.getElementById('syncModal').classList.remove('hidden');
     }
+    
     function closeSyncModal() { document.getElementById('syncModal').classList.add('hidden'); }
     
     function saveSyncSettingsAndFetch() {
@@ -343,8 +363,16 @@
     }
 
     function initCharts() {
-      donutChartInstance = new Chart(document.getElementById('statusDonutChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Leads','Prospect','Deal','Lost'], datasets: [{ data: [0,0,0,0], backgroundColor: ['#6366f1','#06b6d4','#10b981','#64748b'] }] }, options: { responsive: true, maintainAspectRatio: false } });
-      barChartInstance = new Chart(document.getElementById('salesBarChart').getContext('2d'), { type: 'bar', data: { labels: [], datasets: [{ label: 'Active', data: [], backgroundColor: '#3b82f6' }] }, options: { responsive: true, maintainAspectRatio: false } });
+      donutChartInstance = new Chart(document.getElementById('statusDonutChart').getContext('2d'), { 
+        type: 'doughnut', 
+        data: { labels: ['Leads','Prospect','Deal / Won','Lost / Idle'], datasets: [{ data: [0,0,0,0], backgroundColor: ['#6366f1','#06b6d4','#10b981','#64748b'] }] }, 
+        options: { responsive: true, maintainAspectRatio: false } 
+      });
+      barChartInstance = new Chart(document.getElementById('salesBarChart').getContext('2d'), { 
+        type: 'bar', 
+        data: { labels: [], datasets: [{ label: 'Total Client', data: [], backgroundColor: '#3b82f6' }] }, 
+        options: { responsive: true, maintainAspectRatio: false } 
+      });
     }
 
     function updateCharts() {
@@ -358,13 +386,41 @@
       donutChartInstance.update();
       
       const salesMap = {};
-      masterData.forEach(i => { salesMap[i.salesOfficer] = (salesMap[i.salesOfficer]||0) + 1; });
+      masterData.forEach(i => { 
+        if(i.salesOfficer) salesMap[i.salesOfficer] = (salesMap[i.salesOfficer]||0) + 1; 
+      });
       barChartInstance.data.labels = Object.keys(salesMap);
       barChartInstance.data.datasets[0].data = Object.values(salesMap);
       barChartInstance.update();
     }
     
-    function exportToCSV() { /* Code Export CSV sederhana jika diperlukan tetap ada */ }
+    // FUNGSI EXPORT CSV
+    function exportToCSV() {
+      if (!filteredData || filteredData.length === 0) {
+        alert("Tidak ada data untuk diexport!");
+        return;
+      }
+      const csvData = filteredData.map(item => ({
+        "Company ID": item.companyId,
+        "Nama Perusahaan": item.companyName,
+        "Sales Officer": item.salesOfficer,
+        "Project ID": item.projectId,
+        "Tgl Last Follow-up": item.lastFollowUp,
+        "Last Progress": item.lastProgress,
+        "Unit & Qty": item.noteUnit || '',
+        "Masa Sewa": item.noteMasaSewa || '',
+        "Catatan Progress": item.noteStatus || ''
+      }));
+      const csv = Papa.unparse(csvData);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `sales_dashboard_export_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   </script>
 </body>
 </html>
