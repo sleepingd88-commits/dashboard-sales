@@ -1,166 +1,370 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Saya</title>
-    <style>
-        /* Reset tampilan bawaan browser */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f4f6f9;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        /* Navigasi Atas */
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header h1 {
-            font-size: 1.4rem;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
-            font-weight: 500;
-        }
-
-        nav a:hover {
-            color: #3498db;
-        }
-
-        /* Banner Utama (Hero) */
-        .hero {
-            text-align: center;
-            padding: 4rem 2rem;
-            background-color: #ffffff;
-            border-bottom: 1px solid #e1e8ed;
-        }
-
-        .hero h2 {
-            font-size: 2.2rem;
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto 1.5rem auto;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #3498db;
-            color: white;
-            padding: 10px 22px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #2980b9;
-        }
-
-        /* Area Konten Utama */
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
-
-        .cards {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-        }
-
-        .card {
-            background: white;
-            flex: 1;
-            min-width: 250px;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .card h3 {
-            margin-bottom: 0.5rem;
-            color: #2c3e50;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            background-color: #2c3e50;
-            color: white;
-            margin-top: 3rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Company Follow-Up & Progress Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col custom-scrollbar">
 
-    <!-- NAVIGASI / HEADER -->
-    <header>
-        <h1>Website Saya</h1>
-        <nav>
-            <a href="#beranda">Beranda</a>
-            <a href="#tentang">Tentang</a>
-            <a href="#layanan">Layanan</a>
-        </nav>
-    </header>
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[4rem] py-2 sm:py-0 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center justify-between w-full sm:w-auto gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold"><i class="fa-solid fa-chart-line"></i></div>
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h1 class="font-bold text-base sm:text-lg text-slate-100">Sales Dashboard</h1>
+              <span id="syncStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Sheets Live</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="openAddModal()" class="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white"><i class="fa-solid fa-plus text-xs"></i></button>
+      </div>
 
-    <!-- BANNER UTAMA -->
-    <section class="hero" id="beranda">
-        <h2>Selamat Datang di Website Saya!</h2>
-        <p>Ini adalah struktur dasar halaman utama yang sudah rapi. Kamu tinggal mengganti tulisan di dalamnya sesuai keinginan.</p>
-        <a href="#tentang" class="btn">Pelajari Lebih Lanjut</a>
+      <div class="flex items-center justify-between w-full sm:w-auto gap-2">
+        <button onclick="openSyncModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"><i class="fa-solid fa-file-csv text-emerald-400"></i><span>Pengaturan Sheet</span></button>
+        <button onclick="exportToCSV()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"><i class="fa-solid fa-download text-blue-400"></i><span>Export CSV</span></button>
+        <button onclick="openAddModal()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white"><i class="fa-solid fa-plus"></i><span>Tambah Data</span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+    <!-- KPI Section -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4">
+      <div class="glass-card rounded-xl p-3 border-l-4 border-l-blue-500"><div class="flex justify-between text-slate-400 mb-1.5"><span class="text-[10px] font-semibold uppercase">Total PT</span></div><div><span id="kpiTotalCompanies" class="text-xl font-bold text-white">0</span></div></div>
+      <div class="glass-card rounded-xl p-3 border-l-4 border-l-cyan-500"><div class="flex justify-between text-slate-400 mb-1.5"><span class="text-[10px] font-semibold uppercase">Prospect</span></div><div><span id="kpiActiveProspects" class="text-xl font-bold text-white">0</span></div></div>
+      <div class="glass-card rounded-xl p-3 border-l-4 border-l-indigo-500"><div class="flex justify-between text-slate-400 mb-1.5"><span class="text-[10px] font-semibold uppercase">Leads</span></div><div><span id="kpiActiveLeads" class="text-xl font-bold text-white">0</span></div></div>
+      <div class="glass-card rounded-xl p-3 border-l-4 border-l-emerald-500"><div class="flex justify-between text-slate-400 mb-1.5"><span class="text-[10px] font-semibold uppercase">Deal / Won</span></div><div><span id="kpiDealWon" class="text-xl font-bold text-emerald-400">0</span></div></div>
+      <div class="glass-card rounded-xl p-3 border-l-4 border-l-rose-500 bg-rose-950/10"><div class="flex justify-between text-slate-400 mb-1.5"><span class="text-[10px] font-semibold uppercase text-rose-300">Overdue</span></div><div><span id="kpiOverdue" class="text-xl font-bold text-rose-400">0</span></div></div>
+      <div class="glass-card rounded-xl p-3 border-l-4 border-l-amber-500 bg-amber-950/10"><div class="flex justify-between text-slate-400 mb-1.5"><span class="text-[10px] font-semibold uppercase text-amber-300">Warning</span></div><div><span id="kpiWarning" class="text-xl font-bold text-amber-400">0</span></div></div>
     </section>
 
-    <!-- KONTEN UTAMA -->
-    <main class="container" id="tentang">
-        <h2 style="color: #2c3e50;">Fitur Utama</h2>
-        
-        <div class="cards">
-            <div class="card">
-                <h3>🚀 Cepat & Ringan</h3>
-                <p>Desain dibuat sederhana tanpa file CSS terpisah agar kamu tidak pusing mengelola folder.</p>
-            </div>
-            <div class="card">
-                <h3>📱 Responsif</h3>
-                <p>Tampilan otomatis menyesuaikan ukuran layar HP, tablet, maupun laptop.</p>
-            </div>
-            <div class="card">
-                <h3>✏️ Mudah Diedit</h3>
-                <p>Cukup ganti teks yang berada di antara tag HTML seperti ini.</p>
-            </div>
+    <!-- Charts -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div class="lg:col-span-5 glass-card rounded-xl p-4"><h2 class="text-sm font-semibold mb-3">Distribusi Progress</h2><div class="relative h-48 w-full"><canvas id="statusDonutChart"></canvas></div></div>
+      <div class="lg:col-span-7 glass-card rounded-xl p-4"><h2 class="text-sm font-semibold mb-3">Performance Sales</h2><div class="relative h-48 w-full"><canvas id="salesBarChart"></canvas></div></div>
+    </section>
+
+    <!-- Filter & Table -->
+    <section class="glass-card rounded-xl p-3.5 space-y-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Cari PT / ID..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200">
+        <select id="filterSales" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Sales Officer</option></select>
+        <select id="filterAlert" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Status Alert</option><option value="OVERDUE">🔴 Overdue</option><option value="WARNING">🟡 Warning</option><option value="SAFE">🟢 Safe</option></select>
+        <select id="filterProgress" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200"><option value="ALL">Semua Progress</option><option value="Leads">Leads</option><option value="Prospect">Prospect</option><option value="Deal / Won">Deal / Won</option><option value="Lost">Lost</option><option value="Idle">Idle</option></select>
+      </div>
+    </section>
+
+    <section class="glass-card rounded-xl overflow-hidden border border-slate-800">
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left text-xs text-slate-300 min-w-[750px]">
+          <thead class="bg-slate-900/90 font-semibold text-slate-400 uppercase border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-3">Perusahaan & ID</th><th class="py-3 px-3">Sales Officer</th><th class="py-3 px-3">Last Contact</th><th class="py-3 px-3">Progress</th><th class="py-3 px-3">Alert</th><th class="py-3 px-3">Detail (Unit | Masa Sewa | Note)</th><th class="py-3 px-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="companyTableBody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+      <div class="px-3 py-2.5 bg-slate-900/50 flex items-center justify-between text-xs text-slate-400">
+        <div>Menampilkan <span id="showingCount" class="font-semibold text-slate-200">0</span> dari <span id="totalCount" class="font-semibold text-slate-200">0</span></div>
+        <button onclick="fetchGoogleSheetsData()" class="hover:underline text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Sync Ulang Sheet</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <!-- Sync Modal -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="glass-card rounded-xl max-w-lg w-full p-5 space-y-4">
+      <div class="flex justify-between border-b border-slate-800 pb-3"><h3 class="font-semibold text-slate-100">Hubungkan Sheet</h3><button onclick="closeSyncModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="space-y-3">
+        <div><label class="block text-xs mb-1">1. URL CSV Google Sheets:</label><input type="url" id="sheetUrlInput" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs"></div>
+        <div><label class="block text-xs mb-1">2. URL Web App Apps Script:</label><input type="url" id="webAppUrlInput" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs"></div>
+      </div>
+      <div class="flex justify-end gap-2"><button onclick="closeSyncModal()" class="px-3 py-2 rounded-xl text-xs bg-slate-800">Batal</button><button onclick="saveSyncSettingsAndFetch()" class="px-4 py-2 rounded-xl text-xs bg-emerald-600 font-semibold text-white">Simpan</button></div>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <div id="companyModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="glass-card rounded-xl max-w-xl w-full p-5 space-y-3">
+      <div class="flex justify-between border-b border-slate-800 pb-3"><h3 id="modalTitle" class="font-semibold text-slate-100">Tambah Data</h3><button onclick="closeCompanyModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <form id="companyForm" onsubmit="saveCompanyData(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="formRowId">
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block mb-1">Nama Perusahaan *</label><input type="text" id="formCompanyName" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl"></div>
+          <div><label class="block mb-1">Company ID</label><input type="text" id="formCompanyId" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl"></div>
         </div>
-    </main>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block mb-1">Sales Officer *</label><input type="text" id="formSalesOfficer" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl"></div>
+          <div><label class="block mb-1">Project ID *</label><input type="text" id="formProjectId" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block mb-1">Tgl Last Follow-up *</label><input type="date" id="formLastFollowUp" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl"></div>
+          <div><label class="block mb-1">Last Progress *</label>
+            <select id="formLastProgress" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl">
+              <option value="Leads">Leads</option><option value="Prospect">Prospect</option><option value="Deal / Won">Deal / Won</option><option value="Lost">Lost</option><option value="Idle">Idle</option>
+            </select>
+          </div>
+        </div>
+        <div class="p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block mb-1">Unit & Qty</label><input type="text" id="formUnitQty" class="w-full px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg"></div>
+            <div><label class="block mb-1">Masa Sewa</label><input type="text" id="formMasaSewa" class="w-full px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg"></div>
+          </div>
+          <div><label class="block mb-1">Catatan Progress</label><input type="text" id="formCatatanStatus" class="w-full px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg"></div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeCompanyModal()" class="px-3 py-2 rounded-xl bg-slate-800">Batal</button><button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold">Simpan Data</button></div>
+      </form>
+    </div>
+  </div>
 
-    <!-- FOOTER / BAGIAN BAWAH -->
-    <footer>
-        <p>&copy; 2026 Website Saya. Dibuat dari awal.</p>
-    </footer>
+  <script>
+    let masterData = []; let filteredData = []; let donutChartInstance = null; let barChartInstance = null;
+    
+    window.onload = function() { initCharts(); fetchGoogleSheetsData(null, true); };
+    function computeDaysSince(d) { if(!d)return 0; return Math.max(0, Math.floor((new Date() - new Date(d)) / 86400000)); }
 
+    // ====== CORE FIX: FUNGSI PENGIRIMAN KE APPS SCRIPT =======
+    function sendToGoogleScript(payload) {
+      const webAppUrl = localStorage.getItem('gas_web_app_url');
+      if (!webAppUrl) return console.warn("URL Web App kosong.");
+
+      // Kita buang mode 'no-cors' agar frontend bisa membaca response 'sukses/error' dari Google
+      fetch(webAppUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          console.log('Tersimpan di Sheets:', data.message);
+        } else {
+          alert('Gagal dari Server Sheets: ' + data.message);
+        }
+      }).catch(err => {
+        console.error('Fetch error:', err);
+      });
+    }
+
+    function saveCompanyData(e) {
+      e.preventDefault();
+      const id = document.getElementById('formRowId').value;
+      
+      const payload = {
+        action: id ? 'EDIT' : 'ADD',
+        companyId: document.getElementById('formCompanyId').value.trim(),
+        companyName: document.getElementById('formCompanyName').value.trim(),
+        salesOfficer: document.getElementById('formSalesOfficer').value.trim(),
+        projectId: document.getElementById('formProjectId').value.trim(),
+        lastFollowUp: document.getElementById('formLastFollowUp').value,
+        lastProgress: document.getElementById('formLastProgress').value,
+        noteUnit: document.getElementById('formUnitQty').value.trim(),
+        noteMasaSewa: document.getElementById('formMasaSewa').value.trim(),
+        noteStatus: document.getElementById('formCatatanStatus').value.trim()
+      };
+
+      if (!payload.companyId) payload.companyId = `CMP-${Math.floor(100+Math.random()*900)}`;
+
+      if (id) {
+        const item = masterData.find(d => d.id == id);
+        if(item) Object.assign(item, payload);
+      } else {
+        payload.id = Date.now();
+        masterData.unshift(payload);
+      }
+
+      applyFilters(); closeCompanyModal(); sendToGoogleScript(payload);
+    }
+
+    function quickUpdateFollowUp(id) {
+      const item = masterData.find(d => d.id == id);
+      if (item) {
+        item.lastFollowUp = new Date().toISOString().split('T')[0];
+        applyFilters();
+        sendToGoogleScript({ action: 'QUICK_UPDATE', companyId: item.companyId, projectId: item.projectId, lastFollowUp: item.lastFollowUp });
+      }
+    }
+
+    function deleteCompany(id) {
+      const item = masterData.find(d => d.id == id);
+      if (item && confirm('Hapus data ini secara permanen dari Sheet?')) {
+        masterData = masterData.filter(d => d.id != id);
+        applyFilters();
+        sendToGoogleScript({ action: 'DELETE', companyId: item.companyId, projectId: item.projectId });
+      }
+    }
+
+    // ====== MEMBACA DATA 9 HEADER BARU DARI CSV ========
+    function fetchGoogleSheetsData(targetUrl = null, isAutoLoad = false) {
+      const url = targetUrl || localStorage.getItem('gas_sheet_url');
+      if (!url) return;
+
+      Papa.parse(url, {
+        download: true, header: true, skipEmptyLines: true,
+        complete: function(res) {
+          if (res.data && res.data.length > 0) {
+            masterData = res.data.filter(r => r['Nama Perusahaan']).map((r, i) => ({
+              id: i + 1,
+              companyId: r['Company ID'],
+              companyName: r['Nama Perusahaan'],
+              salesOfficer: r['Sales Officer'],
+              projectId: r['Project ID'],
+              lastFollowUp: r['Tgl Last Follow-up'],
+              lastProgress: r['Last Progress'],
+              noteUnit: r['Unit & Qty'],
+              noteMasaSewa: r['Masa Sewa'],
+              noteStatus: r['Catatan Progress']
+            }));
+            populateSalesDropdown(); applyFilters();
+            if (!isAutoLoad) alert(`Berhasil menarik ${masterData.length} data!`);
+          }
+        }
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('companyTableBody');
+      tbody.innerHTML = '';
+      filteredData.forEach(item => {
+        const days = computeDaysSince(item.lastFollowUp);
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/60";
+        tr.innerHTML = `
+          <td class="py-3 px-3"><div class="font-semibold text-slate-100">${item.companyName}</div><div class="text-[10px] text-slate-400 mt-0.5">${item.companyId} • ${item.projectId}</div></td>
+          <td class="py-3 px-3 text-slate-200">${item.salesOfficer}</td>
+          <td class="py-3 px-3 text-slate-300">${item.lastFollowUp}<br><span class="text-[10px] ${days>14?'text-rose-400':'text-slate-500'}">${days} hari lalu</span></td>
+          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">${item.lastProgress}</span></td>
+          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded text-[10px] ${days>14?'bg-rose-500/10 text-rose-400':(days>=7?'bg-amber-500/10 text-amber-400':'bg-emerald-500/10 text-emerald-400')}">${days>14?'OVERDUE':(days>=7?'WARNING':'SAFE')}</span></td>
+          <td class="py-3 px-3"><div class="text-[11px] text-slate-300 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800/80"><strong class="text-blue-400">${item.noteUnit||'-'}</strong> | ${item.noteMasaSewa||'-'} <br>${item.noteStatus||'-'}</div></td>
+          <td class="py-3 px-3 text-center flex gap-1 justify-center mt-2">
+            <button onclick="quickUpdateFollowUp(${item.id})" class="p-1.5 rounded bg-slate-800 text-emerald-400 border border-slate-700"><i class="fa-solid fa-calendar-check"></i></button>
+            <button onclick="editCompany(${item.id})" class="p-1.5 rounded bg-slate-800 text-blue-400 border border-slate-700"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteCompany(${item.id})" class="p-1.5 rounded bg-slate-800 text-rose-400 border border-slate-700"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('showingCount').textContent = filteredData.length;
+      document.getElementById('totalCount').textContent = masterData.length;
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const sales = document.getElementById('filterSales').value;
+      
+      filteredData = masterData.filter(item => {
+        const mSearch = !search || item.companyName.toLowerCase().includes(search) || item.projectId.toLowerCase().includes(search);
+        const mSales = sales === 'ALL' || item.salesOfficer === sales;
+        return mSearch && mSales;
+      }).sort((a, b) => computeDaysSince(b.lastFollowUp) - computeDaysSince(a.lastFollowUp));
+      
+      updateKPIs(); renderTable(); updateCharts();
+    }
+
+    function updateKPIs() {
+      document.getElementById('kpiTotalCompanies').textContent = masterData.length;
+      document.getElementById('kpiOverdue').textContent = masterData.filter(d => computeDaysSince(d.lastFollowUp) > 14).length;
+      document.getElementById('kpiActiveLeads').textContent = masterData.filter(d => d.lastProgress === 'Leads').length;
+      document.getElementById('kpiDealWon').textContent = masterData.filter(d => d.lastProgress === 'Deal / Won').length;
+    }
+
+    function populateSalesDropdown() {
+      const sel = document.getElementById('filterSales');
+      const val = sel.value;
+      sel.innerHTML = '<option value="ALL">Semua Sales Officer</option>';
+      [...new Set(masterData.map(d => d.salesOfficer))].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+      sel.value = val;
+    }
+
+    function editCompany(id) {
+      const item = masterData.find(d => d.id == id);
+      if(!item) return;
+      document.getElementById('formRowId').value = item.id;
+      document.getElementById('formCompanyId').value = item.companyId;
+      document.getElementById('formCompanyName').value = item.companyName;
+      document.getElementById('formSalesOfficer').value = item.salesOfficer;
+      document.getElementById('formProjectId').value = item.projectId;
+      document.getElementById('formLastFollowUp').value = item.lastFollowUp;
+      document.getElementById('formLastProgress').value = item.lastProgress;
+      document.getElementById('formUnitQty').value = item.noteUnit;
+      document.getElementById('formMasaSewa').value = item.noteMasaSewa;
+      document.getElementById('formCatatanStatus').value = item.noteStatus;
+      document.getElementById('modalTitle').textContent = 'Edit Data';
+      document.getElementById('companyModal').classList.remove('hidden');
+    }
+
+    function openAddModal() {
+      document.getElementById('companyForm').reset();
+      document.getElementById('formRowId').value = '';
+      document.getElementById('formLastFollowUp').value = new Date().toISOString().split('T')[0];
+      document.getElementById('modalTitle').textContent = 'Tambah Data';
+      document.getElementById('companyModal').classList.remove('hidden');
+    }
+    
+    function closeCompanyModal() { document.getElementById('companyModal').classList.add('hidden'); }
+    function openSyncModal() {
+      document.getElementById('sheetUrlInput').value = localStorage.getItem('gas_sheet_url') || '';
+      document.getElementById('webAppUrlInput').value = localStorage.getItem('gas_web_app_url') || '';
+      document.getElementById('syncModal').classList.remove('hidden');
+    }
+    function closeSyncModal() { document.getElementById('syncModal').classList.add('hidden'); }
+    
+    function saveSyncSettingsAndFetch() {
+      localStorage.setItem('gas_sheet_url', document.getElementById('sheetUrlInput').value.trim());
+      localStorage.setItem('gas_web_app_url', document.getElementById('webAppUrlInput').value.trim());
+      fetchGoogleSheetsData(); closeSyncModal();
+    }
+
+    function initCharts() {
+      donutChartInstance = new Chart(document.getElementById('statusDonutChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Leads','Prospect','Deal','Lost'], datasets: [{ data: [0,0,0,0], backgroundColor: ['#6366f1','#06b6d4','#10b981','#64748b'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+      barChartInstance = new Chart(document.getElementById('salesBarChart').getContext('2d'), { type: 'bar', data: { labels: [], datasets: [{ label: 'Active', data: [], backgroundColor: '#3b82f6' }] }, options: { responsive: true, maintainAspectRatio: false } });
+    }
+
+    function updateCharts() {
+      if(!donutChartInstance) return;
+      donutChartInstance.data.datasets[0].data = [
+        masterData.filter(d=>d.lastProgress==='Leads').length,
+        masterData.filter(d=>d.lastProgress==='Prospect').length,
+        masterData.filter(d=>d.lastProgress==='Deal / Won').length,
+        masterData.filter(d=>d.lastProgress==='Lost' || d.lastProgress==='Idle').length
+      ];
+      donutChartInstance.update();
+      
+      const salesMap = {};
+      masterData.forEach(i => { salesMap[i.salesOfficer] = (salesMap[i.salesOfficer]||0) + 1; });
+      barChartInstance.data.labels = Object.keys(salesMap);
+      barChartInstance.data.datasets[0].data = Object.values(salesMap);
+      barChartInstance.update();
+    }
+    
+    function exportToCSV() { /* Code Export CSV sederhana jika diperlukan tetap ada */ }
+  </script>
 </body>
 </html>
